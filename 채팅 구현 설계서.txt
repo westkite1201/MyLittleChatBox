@@ -1,0 +1,43 @@
+FRONT-END 
+//UI 라이브러리 :  Material-ui, Reactstrap 
+//상태관리 라이브러리  :  Mobx
+//서버관련 라이브러리 : Axios, Socket.io
+
+
+
+채팅 메세지 객체 = 
+{  
+  message : '',  //채팅 메세지 
+   room_id, : '',   // 룸_id 
+   socket_id :  '', // 소켓 id 로 구분 함  
+   user_id : ''// 있으면 id, 없으면 null
+   user_name : '', //
+} 
+
+함수 
+
+//Client
+connect // connect
+disconnect //disconnect
+getChatRoomList // 채팅방 LIST 받기 
+joinChatRoom // 채팅방 들어가기 
+leaveChatRoom //채팅방 나가기
+getChatMessage // 채팅 메세지 받기 
+summitChatMessage // 채팅 메세지 전송하기
+
+//Admin
+connect // connect
+disconnect //disconnect
+getChatRoomList //채팅방 LIST 받기
+joinChatRoom //채팅방 들어가기 
+leaveChatRoom //채팅방 나가기
+getChatMessage // 채팅 메세지 받기 
+summitChatMessage // 채팅 메세지 전송하기
+
+//System
+sendInfoMessage // 인포 메세지 작성 ( 들어왔다 , 나갔다 ) 
+sendNoticeMessage // 전체 공지 메세지 작성 
+
+
+
+
