@@ -11,8 +11,20 @@ let roomList = []
 
 
 let count = 0;
+
+
+let getSocketIdList = () => {
+    
+}
+
 const connection = (io) =>{
     const nsp = io.of('/chat');
+    const namespaceChat = io.of('/chat');
+    namespaceChat.on('connection',function(socket){
+
+    })
+
+
     // console.log('socket!!!connection')
 
     nsp.on('connection', function(socket){

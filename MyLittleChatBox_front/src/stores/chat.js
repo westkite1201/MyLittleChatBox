@@ -77,7 +77,7 @@ export default class ChatStore{
                             room: data.room,
                             msg: data.msg,
                             isMe: isMe })
-               // console.log(data)
+               // console.log(data)yarn
                  chatMessageMap.set(data.room, temp)
             }else{
                 console.log('else')
@@ -91,6 +91,7 @@ export default class ChatStore{
            
 
         });
+
         this.chatSocket.on("getRoomList", (data) =>{
             this.roomNameList = data.roomNameList;
             console.log(data.roomNameList)
@@ -116,7 +117,8 @@ export default class ChatStore{
             if(chatMessageMap.has(data.room)){
                 let temp = []
                 temp  = chatMessageMap.get(data.room) 
-                temp.push({ nickName: data.nickName,
+                temp.push({ 
+                        nickName: data.nickName,
                         room: data.room,
                         msg: data.msg,
                         system : true
@@ -125,7 +127,8 @@ export default class ChatStore{
                 chatMessageMap.set(data.room, temp)
             }else{
                 console.log('else')
-                let temp = { nickName: data.nickName,
+                let temp = { 
+                            nickName: data.nickName,
                             room: data.room,
                             msg: data.msg,
                             system: true
