@@ -21,9 +21,9 @@ module.exports = {
 
     //skb Redis
     redis: {
-      host      : '106.10.51.192',
+      host      : "127.0.0.1",
       port      : '6379',
-      password  : '1!2@0)1!sykim',
+      password  : '7777',
       database  : 2
     }
     // skb dev redis

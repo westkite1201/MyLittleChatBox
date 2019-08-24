@@ -9,9 +9,15 @@ export default class ChatStore{
     //@observable chatMessageMap = new Map();
     @observable roomNameList = [] 
 
+
+
+
+
     @action
     getRoomList = () =>{
         console.log("getRoomList!!!")
+        
+     
         this.chatSocket.emit('getRoomList', () => {
 
         })

@@ -1,5 +1,5 @@
 const _ = require('lodash')
-
+const userRedis = require('../model/redis/redisDao');
 
 let countdown = 1000;
 let countDownArr = [];
@@ -13,14 +13,23 @@ let roomList = []
 let count = 0;
 
 
-let getSocketIdList = () => {
-    
-}
+
 
 const connection = (io) =>{
     const nsp = io.of('/chat');
     const namespaceChat = io.of('/chat');
     namespaceChat.on('connection',function(socket){
+        socket.on('getRoomList', function(data) {
+     
+        })
+        socket.on('sendChatMessage',( data ) => {
+            let messageInfo = {
+                socketId : socketId,
+                message : data.message,
+            }
+            userRedis.addMessage(messageInfo)
+            socket.emit('sendChatMessage ', { messageInfo : messageInfo })
+        })
 
     })
 
@@ -30,8 +39,8 @@ const connection = (io) =>{
     nsp.on('connection', function(socket){
 
         //현재 모든 roomList를 보여줌 
-        socket.on('getRoomList', function() {
-            console.log("getRoomList", socketIdList)
+        socket.on('getChatRoomList ', function() {
+            console.log("getChatRoomList ", socketIdList)
             
             let socketID = Object.keys(socketIdList)
             let roomNameList = []
@@ -39,7 +48,7 @@ const connection = (io) =>{
                 roomNameList.push(socketIdList[socketID[i]])             
             }       
 
-            socket.emit('getRoomList', { roomNameList : roomNameList})
+            socket.emit('getChatRoomList ', { roomNameList : roomNameList})
 
         })
         //룸 클릭시 그 룸에 들어감 
