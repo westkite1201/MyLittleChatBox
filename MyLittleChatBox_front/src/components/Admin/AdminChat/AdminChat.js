@@ -15,9 +15,10 @@ class AdminChat extends Component{
     componentDidMount(){
         const { getRoomList,setSocketConnection }  =this.props;
         setSocketConnection()
-        setInterval(()=>{
-            getRoomList();
-        },1000)
+        getRoomList();
+        // setInterval(()=>{
+        //     getRoomList();
+        // },1000)
     }
 
     adminJoinRoom = (e) => {
@@ -47,7 +48,6 @@ class AdminChat extends Component{
     render() {
         const { roomSelect } = this.state; 
         const { roomNameList, chatMessage } =this.props;
-        console.log("roomNameList ", roomNameList)
         
         let list = roomNameList.map((item) =>{
             return(

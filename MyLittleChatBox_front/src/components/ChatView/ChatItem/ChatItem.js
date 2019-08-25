@@ -1,5 +1,6 @@
 import React, {Component} from 'react';
 import { styled, withStyles } from '@material-ui/core/styles';
+import {observer} from 'mobx-react'
 import List from '@material-ui/core/List';
 import ListItem from '@material-ui/core/ListItem';
 import Divider from '@material-ui/core/Divider';
@@ -23,6 +24,7 @@ const styles = (theme) => ({
     margin: '10px'
   }
 });
+@observer
 class ChatItem extends Component{
     render(){
         const { classes, nickName, message } = this.props;

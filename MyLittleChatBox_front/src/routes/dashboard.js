@@ -1,5 +1,5 @@
 
-import Chat from '../components/Chat/'
+import Chat from '../components/ChatView'
 import AdminChat from '../components/Admin/AdminChat'
 
 

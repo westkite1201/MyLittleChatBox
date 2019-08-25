@@ -2,7 +2,7 @@ import React, { Component } from 'react'
 import { observer, inject, } from 'mobx-react'
 import ChatItem from './ChatItem'
 
-class Chat extends Component {
+class ChatView extends Component {
 
     state = {
         nickName : 'user',
@@ -56,10 +56,11 @@ class Chat extends Component {
     render() {
         const { chatMessage, getRoomList }  =this.props;
         console.log("chatMessage ", chatMessage)
-        let chatMessageList = chatMessage.map((item) =>{ 
+        let chatMessageList = chatMessage.map((item, i) =>{ 
             return (
                 <ChatItem nickName =  {item.nickName}
                           message ={item.msg}
+                          key = {i}
                 />  
             )
         })
@@ -68,7 +69,7 @@ class Chat extends Component {
                 <button onClick = {this.getRoomList} >
                     getRoomList
                 </button>
-                <button onCLick = {this.makeRoom} > 방만들기 </button>
+                <button onClick = {this.makeRoom} > 방만들기 </button>
                     admin page
                 <div className ={'roomnameList'}>
                     
@@ -91,4 +92,4 @@ export default inject(({ chat }) => ({
     setSocketConnection : chat.setSocketConnection,
     sendChatMessage : chat.sendChatMessage,
     chatMessage : chat.chatMessage
-  }))(observer( Chat));
+  }))(observer( ChatView));
