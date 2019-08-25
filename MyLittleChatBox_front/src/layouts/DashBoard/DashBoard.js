@@ -4,7 +4,7 @@ import { Switch, Route, Redirect } from "react-router-dom";
 import dashboardRoutes from "../../routes/dashboard.js";
 import SideBar from '../../components/SideBar';
 //import SideNav from '../../components/SideNav';
-
+import ChatActivationButton from '../../components/ChatActivationButton'
 
 const switchRoutes = (
     <Switch>
@@ -34,7 +34,9 @@ export default class DashBoard extends Component {
       open : !this.state.open
     }) 
   }
-
+  handleClick = (e) => {
+    console.log(e.target);
+  }
   
 
   
@@ -55,6 +57,7 @@ export default class DashBoard extends Component {
         <SideBar routes = {dashboardRoutes} 
                   openSideBar ={this.openSideBar}
                   open = {open}/>
+        <ChatActivationButton handleClick = {this.handleClick}/>
         <div className = {style.mainPanel}>
             <div className = {style.content} > 
                 <div className ={style.container} 

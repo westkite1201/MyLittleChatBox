@@ -1,6 +1,6 @@
 import { observable, action, computed } from 'mobx';
 import io from 'socket.io-client';
-
+import {isEmpty} from 'lodash'
 let chatMessageMap = new Map();
 export default class ChatStore{
     @observable socket = ''
@@ -47,17 +47,21 @@ export default class ChatStore{
     }
     //socketConnection
     @action
-    setSocketConnection = () => {
+    setSocketConnection = (id) => {
         console.log('setSocketConnection hello ')
-        const chatSocket = io('http://localhost:3031/chat');
-       // console.log(socket)
-        chatSocket.on('connection',() =>{ console.log('connected')});
-        // then
-    
-
-        this.socket = chatSocket;
-        this.chatSocket = chatSocket;
-        //this.sendChatMessage();
+        if(isEmpty(this.chatSocket)){
+            console.log(this.chatSocket)
+            const chatSocket = io('http://localhost:3031/chat');
+            // console.log(socket)
+             chatSocket.on('connection',() =>{ console.log('connected')});
+             // then
+             this.socket = chatSocket;
+             this.chatSocket = chatSocket;
+             //this.sendChatMessage();    
+        
+        console.log(this.chatSocket)
+        console.log(this.socket)
+       
 
         // 서버로부터의 메시지가 수신되면
         this.chatSocket.on("chat", (data) => {
@@ -142,12 +146,11 @@ export default class ChatStore{
                 chatMessageMap.set(data.room, [temp])
             }
         })
-
+        }
     }
 
     @action
     sendChatMessage = (msg, nickName) => {
-   
        console.log("!sendChatMessage!")
      
         // 서버로 자신의 정보를 전송한다.
