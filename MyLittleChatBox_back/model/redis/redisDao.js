@@ -11,12 +11,38 @@ const key_component_location = 'Component_Location_Info';
 const key_route_info = 'RouteInfo';
 const key_component_info = 'ComponentInfo';
 
+const KEY_ROOM =  'CHAT_ROOM'
+const KEY_MESSAGE = 'CHAT_MESSAGE'
+
 //message add 
 const addMessage = (data) => {
-  let key = data.socketId;
+  const key = util.format("%s:%s", KEY_MESSAGE, data.socketId);
   let message = data.message;
   return redishelpers.redis.rpush(key, message);
 }
+
+const getChatRoomList  = (data) => {
+  const key = util.format("%s:%s", KEY_ROOM, data.socketId);
+  return redishelpers.redis.rpush(key, message);
+}
+
+const joinChatRoom = (data) => {
+  //let key = KEY_ROOM + data;
+  // let key = data.socketId;
+  // let message = data.message;
+  // return redishelpers.redis.rpush(key, message);
+}
+
+const leaveChatRoom  = () => {
+  let key = data.socketId;
+  return redishelpers.redis.rpush(key, message);
+}
+
+
+
+
+
+
 
 
 const setUserStatus = (data) => {

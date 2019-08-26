@@ -20,10 +20,11 @@ FRONT-END
 connect // connect
 disconnect //disconnect
 getChatRoomList // 채팅방 LIST 받기 
+createChatRoom  //채팅방 만들기 
 joinChatRoom // 채팅방 들어가기 
 leaveChatRoom //채팅방 나가기
 getChatMessage // 채팅 메세지 받기 
-summitChatMessage // 채팅 메세지 전송하기
+sendChatMessage // 채팅 메세지 전송하기
 
 //Admin
 connect // connect
@@ -32,11 +33,27 @@ getChatRoomList //채팅방 LIST 받기
 joinChatRoom //채팅방 들어가기 
 leaveChatRoom //채팅방 나가기
 getChatMessage // 채팅 메세지 받기 
-summitChatMessage // 채팅 메세지 전송하기
+sendChatMessage // 채팅 메세지 전송하기
 
 //System
 sendInfoMessage // 인포 메세지 작성 ( 들어왔다 , 나갔다 ) 
 sendNoticeMessage // 전체 공지 메세지 작성 
+
+
+어드민이 방을 생성하진 않음 들어갈뿐
+채팅 들어 갔을 시 CreateRoom 
+
+
+//REDIS 구조
+addMessage 
+자료구조 : 리스트
+key = KEY_MESSAGE + 소켓아이디
+ 
+createChatRoom
+key =  KEY_ROOM + 소켓아이디 
+
+getChatRoomList 
+
 
 
 

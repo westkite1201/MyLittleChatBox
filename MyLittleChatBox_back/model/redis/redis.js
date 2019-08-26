@@ -4,6 +4,7 @@
 const config = require('../../config/dbconfig');
 const Redis = require('ioredis');
 const redis = new Redis(config.redis);
+const pub = new Redis(config.redis);
 
 // const RedisClustr = require('redis-clustr');
 // const RedisClient = require('redis');
@@ -44,6 +45,7 @@ const assert = require('assert');
 
 module.exports = {
   redis: redis,
+  pub : pub,
   doRelease: () => {
     redis.disconnect();
   }

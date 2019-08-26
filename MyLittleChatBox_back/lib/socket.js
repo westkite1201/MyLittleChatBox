@@ -1,6 +1,6 @@
 const _ = require('lodash')
-const userRedis = require('../model/redis/redisDao');
-
+//const userRedis = require('../model/redis/redisDao');
+const REDIS = require('../model/redis/redis')
 let countdown = 1000;
 let countDownArr = [];
 let IntervalArrayList = [];
@@ -19,7 +19,13 @@ const connection = (io) =>{
     const nsp = io.of('/chat');
     const namespaceChat = io.of('/chat');
     namespaceChat.on('connection',function(socket){
-        socket.on('getRoomList', function(data) {
+        socket.on('getChatRoomList', function(data) {
+     
+        })
+        socket.on('joinChatRoom', function(data) {
+     
+        })
+        socket.on('getChatRoomList', function(data) {
      
         })
         socket.on('sendChatMessage',( data ) => {
@@ -27,6 +33,7 @@ const connection = (io) =>{
                 socketId : socketId,
                 message : data.message,
             }
+        
             userRedis.addMessage(messageInfo)
             socket.emit('sendChatMessage ', { messageInfo : messageInfo })
         })
