@@ -1,17 +1,20 @@
+
 .contentContainer{
     margin:15px 0px 50px 15px;
     border: 1px solid #dddddd;
     border-radius: 4px;
     -webkit-box-shadow: 0 1px 1px rgba(0, 0, 0, .05);
     box-shadow: 0 5px 10px rgba(0, 0, 0, .05);
+    height: 100%;
 }
 .container{
   background: #e9ecef;
+  height: 100%;
 }
 .wrapper {
     position: "relative";
     top: "0";
-    height: "100vh";
+    height: 100%;
   }
   .mainPanel {
     /* [theme.breakpoints.up("md")]: {
@@ -20,12 +23,14 @@
     overflow: "auto";
     position: "relative";
     float: "right";
+    height: 100%;
     maxHeight: "100%";
     width: "100%";
     overflowScrolling: "touch";
   }
   .content {
     marginTop: "70px";
+    height: 100%;
     padding: "30px 15px";
     minHeight: "calc(100vh - 123px)";
   };

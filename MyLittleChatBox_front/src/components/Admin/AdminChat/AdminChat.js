@@ -2,6 +2,13 @@ import React, { Component } from 'react'
 import { ListGroup, ListGroupItem } from 'reactstrap';
 import { observer, inject, } from 'mobx-react'
 import TextField from '@material-ui/core/TextField';
+
+import SearchOutlinedIcon from '@material-ui/icons/SearchOutlined';
+
+import Button from '@material-ui/core/Button';
+import Icon from '@material-ui/core/Icon';
+
+
 import './AdminChat.scss';
 
 class AdminChat extends Component{
@@ -75,9 +82,16 @@ class AdminChat extends Component{
             )
         })
         return (
-            <div className ='chatRooWrapper'>
+            <div className ='chatRooWrapper' height = "100%">
 
                 <div className = {'roomList'} >
+                    <div className = {'searchBox'}>
+                        <SearchOutlinedIcon/>
+                        <TextField
+                            id="input-with-icon-textfield"
+                            placeholder="Search Contacts"
+                            fullWidth={true}/>    
+                    </div>
                     <ListGroup>
                         {list}
                     </ListGroup>
@@ -86,24 +100,28 @@ class AdminChat extends Component{
                     <div className= 'message'>
                         {chatMessageList}
                     </div>
-                    <div className = "inputList">
-                        <form onSubmit={this.chatMessageSendServer}>
-                          <TextField
+                    <div className = "inputBox">
+                        <form onSubmit={this.chatMessageSendServer} style = {{width:'100%'}}>
+                            <TextField
                                 id="inputMessage"
                                 //label="메세지를 입력해주세요"
                                 //className={classes.textField}
                                 type='text' 
-                                margin="normal"
+                                
                                 name = 'inputMessage'
                                 onChange ={this.handleChatMessage}
                                 placeholder="message"
                             />
-                            <button type="submit">등록</button>
+                            <input id="send-message" type = "submit" style = {{display: "none"}} />
+                            <label htmlFor="send-message" type= "submit" style = {{margin:"0px"}}>
+                                <Button variant="contained" color="primary" onClick = {this.chatMessageSendServer} size = {'small'}>
+                                    Send
+                                    <Icon>send</Icon>
+                                </Button>
+                            </label>
                         </form>    
                     </div>
                 </div>
-
-
             </div>
         )
     }
