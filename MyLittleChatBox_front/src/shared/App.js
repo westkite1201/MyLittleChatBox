@@ -10,6 +10,7 @@ class App extends Component {
                 {/*<Route exact path="/login" component={Login}/>*/}
                 {/*<Route path="/board" component={SideNav}/>*/}
                 <Route path="/" component ={Dashboard}/>
+                <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons" />
             </div>
         );  
     }
