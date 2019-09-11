@@ -50,6 +50,7 @@ class AdminChat extends Component{
         console.log("chatMessageSendServer!!")
         const { sendChatMessage } = this.props;
         sendChatMessage(chatMsg, nickName)
+        document.getElementById('inputMessage').value = ''
         //this.sendChatMessage(this.state.chatMsg)
     }
     render() {
