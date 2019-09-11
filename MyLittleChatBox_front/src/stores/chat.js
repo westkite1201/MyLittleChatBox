@@ -64,38 +64,40 @@ export default class ChatStore{
        
 
         // 서버로부터의 메시지가 수신되면
-        this.chatSocket.on("chat", (data) => {
-           // console.log('data!!!', data)
+        this.chatSocket.on("getChatMessage", (data) => {
+            console.log('[SEO] getChatMessage !!!', data)
+            let messageInfo = data.messageInfo
             let isMe = false;
-            if(data.nickName === 'SEOYEON'){
+            if(messageInfo.userName === 'ADMIN'){
                 isMe = true;
             }
-            this.chatMessage.push({ nickName: data.nickName,
-                                    room: data.room,
-                                    msg: data.msg,
-                                    isMe: isMe })
+            this.chatMessage.push({ userName: messageInfo.userName,
+                                    room: messageInfo.roomId,
+                                    message: messageInfo.message,
+                                    isMe: isMe,
+                                })
 
 
-            console.log("data.room" , data.room)
-            console.log('chatMessageMap.get(data.room) ', chatMessageMap.get(data.room))
+            console.log("data.room" , data.roomId)
+            console.log('chatMessageMap.get(data.room) ', chatMessageMap.get(data.roomId))
            
             // 저장
-            if(chatMessageMap.has(data.room)){
+            if(chatMessageMap.has(data.roomId)){
                 let temp = []
-                temp  = chatMessageMap.get(data.room) 
-                temp.push({ nickName: data.nickName,
-                            room: data.room,
-                            msg: data.msg,
+                temp  = chatMessageMap.get(data.roomId) 
+                temp.push({ userName: messageInfo.userName,
+                            room: data.roomId,
+                            message: data.message,
                             isMe: isMe })
                // console.log(data)yarn
-                 chatMessageMap.set(data.room, temp)
+                 chatMessageMap.set(data.roomId, temp)
             }else{
                 console.log('else')
-                let temp = { nickName: data.nickName,
-                            room: data.room,
-                            msg: data.msg,
+                let temp = { userName: messageInfo.userName,
+                            room: data.roomId,
+                            message: data.message,
                             isMe: isMe }
-                chatMessageMap.set(data.room, [temp])
+                chatMessageMap.set(data.roomId, [temp])
             }
 
            
@@ -150,14 +152,17 @@ export default class ChatStore{
     }
 
     @action
-    sendChatMessage = (msg, nickName) => {
+    sendChatMessage = (message, userName) => {
        console.log("!sendChatMessage!")
      
         // 서버로 자신의 정보를 전송한다.
-        this.chatSocket.emit("chat", {
-            nickName: nickName,
-            room: 'all',
-            msg: msg
+        this.chatSocket.emit("sendChatMessage", {  
+            message : message,  //채팅 메세지 
+            roomId : 'hello',   // 룸_id 
+            socketId :  this.chatSocket.id, // 소켓 id 로 구분 함  
+            userId : userName,// 있으면 id, 없으면 null
+            userName : userName, //
+    
         });
     
     }

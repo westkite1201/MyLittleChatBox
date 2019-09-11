@@ -15,9 +15,11 @@ const KEY_ROOM =  'CHAT_ROOM'
 const KEY_MESSAGE = 'CHAT_MESSAGE'
 
 //message add 
-const addMessage = (data) => {
-  const key = util.format("%s:%s", KEY_MESSAGE, data.socketId);
-  let message = data.message;
+const addMessage = (messageInfo) => {
+  console.log("[SEO][redisDao]   messageInfo ", messageInfo)
+  const key = util.format("%s:%s:%s", KEY_MESSAGE, messageInfo.roomId, messageInfo.socketId);
+  let message = messageInfo.message;
+  console.log("[SEO][redisDao] key , message", key, message)
   return redishelpers.redis.rpush(key, message);
 }
 
@@ -259,7 +261,12 @@ module.exports = {
 
 
   //key 
+  //CHAT 함수 
   addMessage: addMessage,
+  getChatRoomList : getChatRoomList,
+  joinChatRoom : joinChatRoom,
+  leaveChatRoom  : leaveChatRoom,
+
   // Expire Test
   //expireTest: expireTest,
   setExpireDate: setExpireDate,
