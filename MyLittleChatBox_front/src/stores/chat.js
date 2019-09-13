@@ -47,99 +47,99 @@ export default class ChatStore{
             console.log(this.chatSocket)
             const chatSocket = io('http://localhost:3031/chat');
             // console.log(socket)
-             chatSocket.on('connection',() =>{ console.log('connected')});
-             // then
-             this.socket = chatSocket;
-             this.chatSocket = chatSocket;
-             //this.sendChatMessage();    
+            chatSocket.on('connection',() =>{ console.log('connected')});
+            // then
+            this.socket = chatSocket;
+            this.chatSocket = chatSocket;
+            //this.sendChatMessage();    
         
-        console.log(this.chatSocket)
-        console.log(this.socket)
+            console.log(this.chatSocket)
+            console.log(this.socket)
        
 
-        // 서버로부터의 메시지가 수신되면
-        this.chatSocket.on("chat", (data) => {
-           // console.log('data!!!', data)
-            let isMe = false;
-            if(data.nickName === 'SEOYEON'){
-                isMe = true;
-            }
-            this.chatMessage.push({ nickName: data.nickName,
-                                    room: data.room,
-                                    msg: data.msg,
-                                    isMe: isMe })
+            // 서버로부터의 메시지가 수신되면
+            this.chatSocket.on("chat", (data) => {
+            // console.log('data!!!', data)
+                let isMe = false;
+                if(data.nickName === 'SEOYEON'){
+                    isMe = true;
+                }
+                this.chatMessage.push({ nickName: data.nickName,
+                                        room: data.room,
+                                        msg: data.msg,
+                                        isMe: isMe })
 
 
-            console.log("data.room" , data.room)
-            console.log('chatMessageMap.get(data.room) ', chatMessageMap.get(data.room))
-           
-            // 저장
-            if(chatMessageMap.has(data.room)){
-                let temp = []
-                temp  = chatMessageMap.get(data.room) 
-                temp.push({ nickName: data.nickName,
-                            room: data.room,
-                            msg: data.msg,
-                            isMe: isMe })
-               // console.log(data)yarn
-                 chatMessageMap.set(data.room, temp)
-            }else{
-                console.log('else')
-                let temp = { nickName: data.nickName,
-                            room: data.room,
-                            msg: data.msg,
-                            isMe: isMe }
-                chatMessageMap.set(data.room, [temp])
-            }
+                console.log("data.room" , data.room)
+                console.log('chatMessageMap.get(data.room) ', chatMessageMap.get(data.room))
+            
+                // 저장
+                if(chatMessageMap.has(data.room)){
+                    let temp = []
+                    temp  = chatMessageMap.get(data.room) 
+                    temp.push({ nickName: data.nickName,
+                                room: data.room,
+                                msg: data.msg,
+                                isMe: isMe })
+                // console.log(data)yarn
+                    chatMessageMap.set(data.room, temp)
+                }else{
+                    console.log('else')
+                    let temp = { nickName: data.nickName,
+                                room: data.room,
+                                msg: data.msg,
+                                isMe: isMe }
+                    chatMessageMap.set(data.room, [temp])
+                }
 
-           
+            
 
-        });
+            });
 
-        this.chatSocket.on("getRoomList", (data) =>{
-            this.roomNameList = data.roomNameList;
-            console.log(data.roomNameList)
-        })
+            this.chatSocket.on("getRoomList", (data) =>{
+                this.roomNameList = data.roomNameList;
+                console.log(data.roomNameList)
+            })
      
-        this.chatSocket.emit("disconnect", {
-                                            nickName: 'fsdfds',
-                                            room: 'all',
-                                        });
+            this.chatSocket.emit("disconnect", {
+                                                nickName: 'fsdfds',
+                                                room: 'all',
+                                            });
         
 
-        //시스템 메세지일때 
-        this.chatSocket.on("system", (data) =>{
+            //시스템 메세지일때 
+            this.chatSocket.on("system", (data) =>{
 
-            this.chatMessage.push({ 
-                nickName: data.nickName,
-                room: data.room,
-                msg: data.msg,
-                system: true
-            })
+                this.chatMessage.push({ 
+                    nickName: data.nickName,
+                    room: data.room,
+                    msg: data.msg,
+                    system: true
+                })
 
-            // 저장
-            if(chatMessageMap.has(data.room)){
-                let temp = []
-                temp  = chatMessageMap.get(data.room) 
-                temp.push({ 
-                        nickName: data.nickName,
-                        room: data.room,
-                        msg: data.msg,
-                        system : true
-                        })
-                // console.log(data)
-                chatMessageMap.set(data.room, temp)
-            }else{
-                console.log('else')
-                let temp = { 
+                // 저장
+                if(chatMessageMap.has(data.room)){
+                    let temp = []
+                    temp  = chatMessageMap.get(data.room) 
+                    temp.push({ 
                             nickName: data.nickName,
                             room: data.room,
                             msg: data.msg,
-                            system: true
-                        }
-                chatMessageMap.set(data.room, [temp])
-            }
-        })
+                            system : true
+                            })
+                    // console.log(data)
+                    chatMessageMap.set(data.room, temp)
+                }else{
+                    console.log('else')
+                    let temp = { 
+                                nickName: data.nickName,
+                                room: data.room,
+                                msg: data.msg,
+                                system: true
+                            }
+                    chatMessageMap.set(data.room, [temp])
+                }
+            })
         }
     }
 

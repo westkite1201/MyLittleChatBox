@@ -10,6 +10,7 @@ import Icon from '@material-ui/core/Icon';
 
 
 import './AdminChat.scss';
+import { symbols } from 'ansi-colors';
 
 class AdminChat extends Component{
     state = {
@@ -17,17 +18,30 @@ class AdminChat extends Component{
         chatMsg : '',
         temp : [],
         roomSelect : '',
+        roomNameList: [],
+        searchResult:[],
         //chatSocket : io('http://localhost:3031/chat')
     }
     componentDidMount(){
         const { getRoomList,setSocketConnection }  =this.props;
-        setSocketConnection()
+        setSocketConnection('admin')
         getRoomList();
         // setInterval(()=>{
         //     getRoomList();
         // },1000)
+        this.setState({
+            roomNameList: this.props.roomNameList
+        })
     }
-
+    static getDerivedStateFromProps(nextProps, prevState){
+        if(nextProps.roomNameList !== prevState.roomNameList){
+            console.log('newProps####')
+            console.log(nextProps.roomNameList)
+            console.log(prevState.roomNameList)
+            return {roomNameList: nextProps.roomNameList};
+        }
+        return null
+    }
     adminJoinRoom = (e) => {
         const {adminJoinRoom } =this.props;
         adminJoinRoom(e.target.name);
@@ -53,20 +67,45 @@ class AdminChat extends Component{
         document.getElementById('inputMessage').value = ''
         //this.sendChatMessage(this.state.chatMsg)
     }
-    render() {
-        const { roomSelect } = this.state; 
-        const { roomNameList, chatMessage } =this.props;
-        
-        let list = roomNameList.map((item) =>{
+    handleSearch = (e) =>{
+        console.log("handleSearch##")
+        e.preventDefault();
+        const { roomNameList } = this.props
+        document.getElementById('input-with-icon-textfield').value = ''
+
+    }
+    handleSearchKeyword = (e) => {
+        const { roomNameList } = this.state;
+        this.setState({
+            searchResult: this.createListItem(roomNameList.filter(item=>{
+                console.log(item.includes(e.target.value))
+                return item.includes(e.target.value)
+            }))
+        })
+        console.log(roomNameList)
+    }
+    createListItem = (list => {
+        const {roomSelect} = this.state
+        return list.map((item, i ) => {
             return(
                 <ListGroupItem className ={ roomSelect === item ? 'active' : 'unactive' }
                                tag="button" 
-                               onClick ={this.adminJoinRoom} 
+                               onClick ={this.adminJoinRoom}
+                               key = {i}
                                name={item} >{item}
                 </ListGroupItem>
             )
-        });
+        })
+    })
+    render() {
+        let { roomSelect, roomNameList } = this.state; 
+        const { chatMessage } =this.props;
+        console.log(roomNameList)
+        console.log(this.state.roomNameList)
+        let list = this.createListItem(roomNameList)
+
         let chatMessageList = chatMessage.map((item) =>{ 
+            console.log(item)
             let messageClassName ;
 
             if(item.system){
@@ -86,13 +125,17 @@ class AdminChat extends Component{
             <div className ='chatRooWrapper' height = "100%">
 
                 <div className = {'roomList'} >
-                    <div className = {'searchBox'}>
+                    <form className = {'searchBox'} onSubmit={this.handleSearch}>
                         <SearchOutlinedIcon/>
                         <TextField
                             id="input-with-icon-textfield"
                             placeholder="Search Contacts"
+                            onChange={this.handleSearchKeyword}
                             fullWidth={true}/>    
-                    </div>
+                    </form>
+                    <ListGroup>
+                        {this.state.searchResult}
+                    </ListGroup>
                     <ListGroup>
                         {list}
                     </ListGroup>
