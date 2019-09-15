@@ -7,8 +7,8 @@ import SearchOutlinedIcon from '@material-ui/icons/SearchOutlined';
 
 import Button from '@material-ui/core/Button';
 import Icon from '@material-ui/core/Icon';
-
-
+import {isEmpty} from 'lodash'
+import ClearSharpIcon from '@material-ui/icons/ClearSharp';
 import './AdminChat.scss';
 import { symbols } from 'ansi-colors';
 
@@ -18,29 +18,17 @@ class AdminChat extends Component{
         chatMsg : '',
         temp : [],
         roomSelect : '',
-        roomNameList: [],
         searchResult:[],
+        roomList:[],
         //chatSocket : io('http://localhost:3031/chat')
     }
     componentDidMount(){
-        const { getRoomList,setSocketConnection }  =this.props;
+        const { getRoomList, setSocketConnection }  =this.props;
         setSocketConnection('admin')
         getRoomList();
         // setInterval(()=>{
         //     getRoomList();
         // },1000)
-        this.setState({
-            roomNameList: this.props.roomNameList
-        })
-    }
-    static getDerivedStateFromProps(nextProps, prevState){
-        if(nextProps.roomNameList !== prevState.roomNameList){
-            console.log('newProps####')
-            console.log(nextProps.roomNameList)
-            console.log(prevState.roomNameList)
-            return {roomNameList: nextProps.roomNameList};
-        }
-        return null
     }
     adminJoinRoom = (e) => {
         const {adminJoinRoom } =this.props;
@@ -71,17 +59,26 @@ class AdminChat extends Component{
         console.log("handleSearch##")
         e.preventDefault();
         const { roomNameList } = this.props
+        
         document.getElementById('input-with-icon-textfield').value = ''
 
     }
     handleSearchKeyword = (e) => {
-        const { roomNameList } = this.state;
-        this.setState({
-            searchResult: this.createListItem(roomNameList.filter(item=>{
-                console.log(item.includes(e.target.value))
-                return item.includes(e.target.value)
-            }))
-        })
+        const { roomNameList } = this.props;
+        if(isEmpty(e.target.value)){
+            console.log('none')
+            this.setState({
+                searchResult:[],
+            })
+            console.log(this.state.searchResult)
+        }else{
+            this.setState({
+                searchResult: this.createListItem(roomNameList.filter(item=>{
+                    console.log(item.includes(e.target.value))
+                    return item.includes(e.target.value)
+                }))
+            })
+        }        
         console.log(roomNameList)
     }
     createListItem = (list => {
@@ -97,14 +94,25 @@ class AdminChat extends Component{
             )
         })
     })
+    removeSearchResult = (e) =>{
+        this.setState({
+            searchResult:[],
+        })
+    }
+    handleSearchCancel =(e) => {
+        console.log(e.key)
+        if(e.key === 'Escape'){
+            console.log(e.target.key)
+            this.setState({
+                searchResult:[],
+            })  
+        }
+    }
     render() {
-        let { roomSelect, roomNameList } = this.state; 
+        let { roomSelect } = this.state; 
         const { chatMessage } =this.props;
-        console.log(roomNameList)
-        console.log(this.state.roomNameList)
-        let list = this.createListItem(roomNameList)
-
-        let chatMessageList = chatMessage.map((item) =>{ 
+        console.log(this.state.roomList)
+        let chatMessageList = chatMessage.map((item, i) =>{ 
             console.log(item)
             let messageClassName ;
 
@@ -118,7 +126,7 @@ class AdminChat extends Component{
                 }
             }
             return (
-                <div className = {messageClassName} >{item.nickName+ ": " + item.msg }</div>
+                <div className = {messageClassName} key = {i}>{item.nickName+ ": " + item.msg }</div>
             )
         })
         return (
@@ -131,13 +139,15 @@ class AdminChat extends Component{
                             id="input-with-icon-textfield"
                             placeholder="Search Contacts"
                             onChange={this.handleSearchKeyword}
+                            onKeyDown={this.handleSearchCancel}
                             fullWidth={true}/>    
+                        <ClearSharpIcon onClick = {this.removeSearchResult}/>
                     </form>
                     <ListGroup>
                         {this.state.searchResult}
                     </ListGroup>
                     <ListGroup>
-                        {list}
+                        {this.createListItem(this.props.roomNameList)}
                     </ListGroup>
                 </div>
                 <div className = {'chatRoom'} >
