@@ -63,51 +63,6 @@ export default class ChatStore{
             console.log(this.socket)
        
 
-<<<<<<< HEAD
-            // 서버로부터의 메시지가 수신되면
-            this.chatSocket.on("chat", (data) => {
-            // console.log('data!!!', data)
-                let isMe = false;
-                if(data.nickName === 'SEOYEON'){
-                    isMe = true;
-                }
-                this.chatMessage.push({ nickName: data.nickName,
-                                        room: data.room,
-                                        msg: data.msg,
-                                        isMe: isMe })
-
-
-                console.log("data.room" , data.room)
-                console.log('chatMessageMap.get(data.room) ', chatMessageMap.get(data.room))
-            
-                // 저장
-                if(chatMessageMap.has(data.room)){
-                    let temp = []
-                    temp  = chatMessageMap.get(data.room) 
-                    temp.push({ nickName: data.nickName,
-                                room: data.room,
-                                msg: data.msg,
-                                isMe: isMe })
-                // console.log(data)yarn
-                    chatMessageMap.set(data.room, temp)
-                }else{
-                    console.log('else')
-                    let temp = { nickName: data.nickName,
-                                room: data.room,
-                                msg: data.msg,
-                                isMe: isMe }
-                    chatMessageMap.set(data.room, [temp])
-                }
-
-            
-
-            });
-
-            this.chatSocket.on("getRoomList", (data) =>{
-                this.roomNameList = data.roomNameList;
-                console.log(data.roomNameList)
-            })
-=======
         // 서버로부터의 메시지가 수신되면
         this.chatSocket.on("getChatMessage", (data) => {
             console.log('[SEO] getChatMessage !!!', data)
@@ -153,7 +108,6 @@ export default class ChatStore{
             this.roomNameList = data.roomNameList;
             console.log(data.roomNameList)
         })
->>>>>>> feature/chatProtoLogic
      
             this.chatSocket.emit("disconnect", {
                                                 nickName: 'fsdfds',
