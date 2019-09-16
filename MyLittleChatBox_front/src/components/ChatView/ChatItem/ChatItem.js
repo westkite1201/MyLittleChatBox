@@ -17,6 +17,7 @@ const styles = (theme) => ({
   },
   inline: {
     display: 'inline',
+    wordBreak:'break-all'
   },
   chatItem: {
     background: 'white',

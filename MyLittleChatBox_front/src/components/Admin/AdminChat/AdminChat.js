@@ -7,9 +7,10 @@ import SearchOutlinedIcon from '@material-ui/icons/SearchOutlined';
 
 import Button from '@material-ui/core/Button';
 import Icon from '@material-ui/core/Icon';
-
-
+import {isEmpty} from 'lodash'
+import ClearSharpIcon from '@material-ui/icons/ClearSharp';
 import './AdminChat.scss';
+import { symbols } from 'ansi-colors';
 
 class AdminChat extends Component{
     state = {
@@ -17,17 +18,18 @@ class AdminChat extends Component{
         chatMsg : '',
         temp : [],
         roomSelect : '',
+        searchResult:[],
+        roomList:[],
         //chatSocket : io('http://localhost:3031/chat')
     }
     componentDidMount(){
-        const { getRoomList,setSocketConnection }  =this.props;
-        setSocketConnection()
+        const { getRoomList, setSocketConnection }  =this.props;
+        setSocketConnection('admin')
         getRoomList();
         // setInterval(()=>{
         //     getRoomList();
         // },1000)
     }
-
     adminJoinRoom = (e) => {
         const {adminJoinRoom } =this.props;
         adminJoinRoom(e.target.name);
@@ -50,22 +52,68 @@ class AdminChat extends Component{
         console.log("chatMessageSendServer!!")
         const { sendChatMessage } = this.props;
         sendChatMessage(chatMsg, nickName)
+        document.getElementById('inputMessage').value = ''
         //this.sendChatMessage(this.state.chatMsg)
     }
-    render() {
-        const { roomSelect } = this.state; 
-        const { roomNameList, chatMessage } =this.props;
+    handleSearch = (e) =>{
+        console.log("handleSearch##")
+        e.preventDefault();
+        const { roomNameList } = this.props
         
-        let list = roomNameList.map((item) =>{
+        document.getElementById('input-with-icon-textfield').value = ''
+
+    }
+    handleSearchKeyword = (e) => {
+        const { roomNameList } = this.props;
+        if(isEmpty(e.target.value)){
+            console.log('none')
+            this.setState({
+                searchResult:[],
+            })
+            console.log(this.state.searchResult)
+        }else{
+            this.setState({
+                searchResult: this.createListItem(roomNameList.filter(item=>{
+                    console.log(item.includes(e.target.value))
+                    return item.includes(e.target.value)
+                }))
+            })
+        }        
+        console.log(roomNameList)
+    }
+    createListItem = (list => {
+        const {roomSelect} = this.state
+        return list.map((item, i ) => {
             return(
                 <ListGroupItem className ={ roomSelect === item ? 'active' : 'unactive' }
                                tag="button" 
-                               onClick ={this.adminJoinRoom} 
+                               onClick ={this.adminJoinRoom}
+                               key = {i}
                                name={item} >{item}
                 </ListGroupItem>
             )
-        });
-        let chatMessageList = chatMessage.map((item) =>{ 
+        })
+    })
+    removeSearchResult = (e) =>{
+        this.setState({
+            searchResult:[],
+        })
+    }
+    handleSearchCancel =(e) => {
+        console.log(e.key)
+        if(e.key === 'Escape'){
+            console.log(e.target.key)
+            this.setState({
+                searchResult:[],
+            })  
+        }
+    }
+    render() {
+        let { roomSelect } = this.state; 
+        const { chatMessage } =this.props;
+        console.log(this.state.roomList)
+        let chatMessageList = chatMessage.map((item, i) =>{ 
+            console.log(item)
             let messageClassName ;
 
             if(item.system){
@@ -78,22 +126,28 @@ class AdminChat extends Component{
                 }
             }
             return (
-                <div className = {messageClassName} >{item.nickName+ ": " + item.msg }</div>
+                <div className = {messageClassName} key = {i}>{item.nickName+ ": " + item.msg }</div>
             )
         })
         return (
             <div className ='chatRooWrapper' height = "100%">
 
                 <div className = {'roomList'} >
-                    <div className = {'searchBox'}>
+                    <form className = {'searchBox'} onSubmit={this.handleSearch}>
                         <SearchOutlinedIcon/>
                         <TextField
                             id="input-with-icon-textfield"
                             placeholder="Search Contacts"
+                            onChange={this.handleSearchKeyword}
+                            onKeyDown={this.handleSearchCancel}
                             fullWidth={true}/>    
-                    </div>
+                        <ClearSharpIcon onClick = {this.removeSearchResult}/>
+                    </form>
                     <ListGroup>
-                        {list}
+                        {this.state.searchResult}
+                    </ListGroup>
+                    <ListGroup>
+                        {this.createListItem(this.props.roomNameList)}
                     </ListGroup>
                 </div>
                 <div className = {'chatRoom'} >

@@ -1,0 +1,14 @@
+.chatViewWrapper{
+    height: 100%;
+    .messageWrapper{
+        max-height: calc(100% - 70px);
+        overflow: auto;
+    }
+    .MuiTextField-root	{
+        height: 40px;
+        width: calc(100% - 80px);
+    }
+    .MuiButton-root	{
+        height: 40px;
+    }
+}
