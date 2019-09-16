@@ -2,6 +2,7 @@ import React, { Component } from 'react'
 import { ListGroup, ListGroupItem } from 'reactstrap';
 import { observer, inject, } from 'mobx-react'
 import TextField from '@material-ui/core/TextField';
+import ChatItem from  '../../ChatView/ChatItem'
 
 import SearchOutlinedIcon from '@material-ui/icons/SearchOutlined';
 
@@ -51,8 +52,12 @@ class AdminChat extends Component{
         e.preventDefault();
         console.log("chatMessageSendServer!!")
         const { sendChatMessage } = this.props;
+<<<<<<< HEAD
         sendChatMessage(chatMsg, nickName)
         document.getElementById('inputMessage').value = ''
+=======
+        sendChatMessage(chatMsg, 'ADMIN')
+>>>>>>> feature/chatProtoLogic
         //this.sendChatMessage(this.state.chatMsg)
     }
     handleSearch = (e) =>{
@@ -126,7 +131,14 @@ class AdminChat extends Component{
                 }
             }
             return (
+<<<<<<< HEAD
                 <div className = {messageClassName} key = {i}>{item.nickName+ ": " + item.msg }</div>
+=======
+                !item.isMe ?
+                <ChatItem/> : 
+                <div className = {messageClassName} >{item.userName+ ": " + item.message }</div>
+             
+>>>>>>> feature/chatProtoLogic
             )
         })
         return (
@@ -167,12 +179,12 @@ class AdminChat extends Component{
                                 placeholder="message"
                             />
                             <input id="send-message" type = "submit" style = {{display: "none"}} />
-                            <label htmlFor="send-message" type= "submit" style = {{margin:"0px"}}>
-                                <Button variant="contained" color="primary" onClick = {this.chatMessageSendServer} size = {'small'}>
-                                    Send
-                                    <Icon>send</Icon>
-                                </Button>
-                            </label>
+                                <label htmlFor="send-message" type= "submit" style = {{margin:"0px"}}>
+                                    <Button variant="contained" color="primary" onClick = {this.chatMessageSendServer} size = {'small'}>
+                                        Send
+                                        <Icon>send</Icon>
+                                    </Button>
+                                </label>
                         </form>    
                     </div>
                 </div>
