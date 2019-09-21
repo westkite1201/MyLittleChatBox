@@ -1,16 +1,11 @@
 const _ = require('lodash')
 const userRedis = require('../model/redis/redisDao');
 const REDIS = require('../model/redis/redis')
-let countdown = 1000;
-let countDownArr = [];
-let IntervalArrayList = [];
+
 
 let socketIdList = [] //현재 소켓 id가 속한 roomList를 반환 
 let idList = [] //  id에 속한 room 리스트를 반환 
 let roomList = []
-
-
-let count = 0;
 
 
 
@@ -19,14 +14,26 @@ const connection = (io) =>{
     const nsp = io.of('/chat');
     const namespaceChat = io.of('/chat');
     namespaceChat.on('connection',function(socket){
+
         socket.on('getChatRoomList', function(data) {
      
         })
         socket.on('joinChatRoom', function(data) {
      
         })
+
+        socket.on('createChatRoom', function(data){
+            userRedis.createChatRoom(data);
+
+        })
+        
         socket.on('getChatRoomList', function(data) {
-     
+            userRedis.getChatRoomList(data)
+            //
+        })
+
+        socket.on('getChatRoomMember', function(data) {
+            userRedis.getChatRoomMember(data)
         })
         socket.on('sendChatMessage',( data ) => {
             let messageInfo = {  

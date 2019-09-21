@@ -24,9 +24,9 @@ class AdminChat extends Component{
         //chatSocket : io('http://localhost:3031/chat')
     }
     componentDidMount(){
-        const { getRoomList, setSocketConnection }  =this.props;
+        const { getChatRoomList, setSocketConnection }  =this.props;
         setSocketConnection('admin')
-        getRoomList();
+        getChatRoomList();
         // setInterval(()=>{
         //     getRoomList();
         // },1000)
@@ -185,7 +185,7 @@ class AdminChat extends Component{
 }
 
 export default inject(({ chat }) => ({
-    getRoomList : chat.getRoomList,
+    getChatRoomList : chat.getChatRoomList,
     roomNameList : chat.roomNameList,
     setSocketConnection : chat.setSocketConnection,
     sendChatMessage : chat.sendChatMessage,

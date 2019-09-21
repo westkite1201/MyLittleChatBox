@@ -15,11 +15,12 @@ class ChatView extends Component {
         //chatSocket : io('http://localhost:3031/chat')
     }
     componentDidMount(){
-        const { setSocketConnection,getRoomList,joinRoom } = this.props;
-        setSocketConnection();
-        joinRoom(this.state.nickName);
+        const { setSocketConnection,
+                 } = this.props;
+
+         setSocketConnection();
+        console.log("[SEO][ChatView] componentDidMount")
        // getRoomList();
-       // this.setSocketConnection(); 
     }
 
     //서버로 전송 
@@ -101,6 +102,8 @@ class ChatView extends Component {
     }
 }
 export default inject(({ chat }) => ({
+    createChatRoom : chat.createChatRoom,
+    initUserInfo : chat.initUserInfo,
     getRoomList : chat.getRoomList,
     joinRoom  : chat.joinRoom,
     setSocketConnection : chat.setSocketConnection,

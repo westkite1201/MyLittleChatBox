@@ -22,17 +22,29 @@ const addMessage = (messageInfo) => {
   console.log("[SEO][redisDao] key , message", key, message)
   return redishelpers.redis.rpush(key, message);
 }
-
-const getChatRoomList  = (data) => {
-  const key = util.format("%s:%s", KEY_ROOM, data.socketId);
-  return redishelpers.redis.rpush(key, message);
+/* chatRoom 생성  */
+/* set 중복없는 value 값  */
+/* key = roomId + socketId */
+/* value socketId */
+const createChatRoom = (messageInfo) => {
+  const key = util.format("%s", KEY_ROOM);
+  redishelpers.redis.sadd(key, messageInfo.roomId); // roomList를 위해
+}
+/*  */
+const joinChatRoom = (messageInfo) => {
+  const key = util.format("%s:%s", KEY_ROOM, messageInfo.roomId);
+  redishelpers.redis.sadd(key, messageInfo.socketId);
 }
 
-const joinChatRoom = (data) => {
-  //let key = KEY_ROOM + data;
-  // let key = data.socketId;
-  // let message = data.message;
-  // return redishelpers.redis.rpush(key, message);
+const getChatRoomList  = (messageInfo) => {
+  const key = util.format("%s:%s", KEY_ROOM);
+  return redishelpers.redis.smembers(key, smembers);
+}
+
+/* */
+const getChatRoomMember  = (messageInfo) => {
+  const key = util.format("%s:%s", KEY_ROOM, messageInfo.socketId);
+  return redishelpers.redis.smembers(key, smembers);
 }
 
 const leaveChatRoom  = () => {
@@ -263,7 +275,9 @@ module.exports = {
   //key 
   //CHAT 함수 
   addMessage: addMessage,
+  createChatRoom : createChatRoom,
   getChatRoomList : getChatRoomList,
+  getChatRoomMember :getChatRoomMember,
   joinChatRoom : joinChatRoom,
   leaveChatRoom  : leaveChatRoom,
 
