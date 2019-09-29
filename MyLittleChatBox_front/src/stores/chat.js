@@ -16,11 +16,9 @@ export default class ChatStore{
     @action
     getRoomList = () =>{
         console.log("getRoomList!!!")
-        
+        console.log(this.chatSocket)
      
-        this.chatSocket.emit('getRoomList', () => {
-
-        })
+        this.chatSocket.emit('getChatRoomList',{});
     }
     //client 입장 
     @action
@@ -74,7 +72,6 @@ export default class ChatStore{
             this.chatMessage.push({ userName: messageInfo.userName,
                                     room: messageInfo.roomId,
                                     message: messageInfo.message,
-                                    isMe: isMe,
                                 })
 
 
@@ -104,7 +101,7 @@ export default class ChatStore{
 
         });
 
-        this.chatSocket.on("getRoomList", (data) =>{
+        this.chatSocket.on("getChatRoomList", (data) =>{
             this.roomNameList = data.roomNameList;
             console.log(data.roomNameList)
         })

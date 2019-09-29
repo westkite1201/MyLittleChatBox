@@ -1,6 +1,7 @@
 import React, { Component } from 'react'
 import { ListGroup, ListGroupItem } from 'reactstrap';
 import { observer, inject, } from 'mobx-react'
+import { observable, action } from 'mobx'
 import TextField from '@material-ui/core/TextField';
 import ChatItem from  '../../ChatView/ChatItem'
 
@@ -14,6 +15,8 @@ import './AdminChat.scss';
 import { symbols } from 'ansi-colors';
 
 class AdminChat extends Component{
+    @observable searchResult = [];
+    @observable roomList = [];
     state = {
         nickName : 'SEOYEON',
         chatMsg : '',
@@ -63,24 +66,39 @@ class AdminChat extends Component{
         document.getElementById('input-with-icon-textfield').value = ''
 
     }
-    handleSearchKeyword = (e) => {
+    @action
+    handleSearchKeyword = (e) =>{
         const { roomNameList } = this.props;
         if(isEmpty(e.target.value)){
             console.log('none')
-            this.setState({
-                searchResult:[],
-            })
-            console.log(this.state.searchResult)
+            this.searchResult = [];
+            console.log(this.searchResult)
         }else{
-            this.setState({
-                searchResult: this.createListItem(roomNameList.filter(item=>{
-                    console.log(item.includes(e.target.value))
-                    return item.includes(e.target.value)
-                }))
-            })
+            this.searchResult = this.createListItem(roomNameList.filter(item=>{
+                console.log(item.includes(e.target.value))
+                return item.includes(e.target.value)
+            }))
         }        
         console.log(roomNameList)
     }
+    // handleSearchKeyword = (e) => {
+    //     const { roomNameList } = this.props;
+    //     if(isEmpty(e.target.value)){
+    //         console.log('none')
+    //         this.setState({
+    //             searchResult:[],
+    //         })
+    //         console.log(this.state.searchResult)
+    //     }else{
+    //         this.setState({
+    //             searchResult: this.createListItem(roomNameList.filter(item=>{
+    //                 console.log(item.includes(e.target.value))
+    //                 return item.includes(e.target.value)
+    //             }))
+    //         })
+    //     }        
+    //     console.log(roomNameList)
+    // }
     createListItem = (list => {
         const {roomSelect} = this.state
         return list.map((item, i ) => {
@@ -94,26 +112,40 @@ class AdminChat extends Component{
             )
         })
     })
-    removeSearchResult = (e) =>{
-        this.setState({
-            searchResult:[],
-        })
+    @action
+    removeSearchResult = () => {
+        this.searchResult = [];
     }
-    handleSearchCancel =(e) => {
+    // removeSearchResult = (e) =>{
+    //     this.setState({
+    //         searchResult:[],
+    //     })
+    // }
+    // handleSearchCancel =(e) => {
+    //     console.log(e.key)
+    //     if(e.key === 'Escape'){
+    //         console.log(e.target.key)
+    //         this.setState({
+    //             searchResult:[],
+    //         })  
+    //     }
+    // }
+    @action
+    handleSearchCancel = (e) =>{
         console.log(e.key)
         if(e.key === 'Escape'){
             console.log(e.target.key)
-            this.setState({
-                searchResult:[],
-            })  
+            this.searchResult = [];
         }
     }
     render() {
         let { roomSelect } = this.state; 
         const { chatMessage } =this.props;
         console.log(this.state.roomList)
+        console.log(this.props.roomNameList)
         let chatMessageList = chatMessage.map((item, i) =>{ 
             console.log(item)
+            console.log(item.message)
             let messageClassName ;
 
             if(item.system){
@@ -127,8 +159,10 @@ class AdminChat extends Component{
             }
             return (
                 !item.isMe ?
-                <ChatItem/> : 
-                <div className = {messageClassName} >{item.userName+ ": " + item.message }</div>
+                <ChatItem key = {i} nickName = {item.userName} message = {item.message}/> : 
+                <div className = {messageClassName} key = {i} >
+                    {item.userName+ ": " + item.message }
+                </div>
              
             )
         })
@@ -147,7 +181,7 @@ class AdminChat extends Component{
                         <ClearSharpIcon onClick = {this.removeSearchResult}/>
                     </form>
                     <ListGroup>
-                        {this.state.searchResult}
+                        {this.searchResult}
                     </ListGroup>
                     <ListGroup>
                         {this.createListItem(this.props.roomNameList)}

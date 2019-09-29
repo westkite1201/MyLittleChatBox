@@ -11,7 +11,6 @@ class ChatView extends Component {
     state = {
         nickName : 'user',
         chatMsg : '',
-        temp : [],
         //chatSocket : io('http://localhost:3031/chat')
     }
     componentDidMount(){
@@ -30,6 +29,9 @@ class ChatView extends Component {
         const { sendChatMessage } = this.props;
         sendChatMessage(chatMsg, nickName)
         document.getElementById('inputMessage').value = ''
+        this.setState({
+            chatMsg:''
+        })
         //this.sendChatMessage(this.state.chatMsg)
 
     }
@@ -64,8 +66,8 @@ class ChatView extends Component {
         console.log("chatMessage ", chatMessage)
         let chatMessageList = chatMessage.map((item, i) =>{ 
             return (
-                <ChatItem nickName =  {item.nickName}
-                          message ={item.msg}
+                <ChatItem nickName =  {item.userName}
+                          message ={item.message}
                           key = {i}
                 />  
             )
@@ -75,27 +77,27 @@ class ChatView extends Component {
                 <div className = 'messageWrapper'>
                     {chatMessageList}
                 </div>
-                <form onSubmit={this.chatMessageSendServer}>
-                    <input onChange ={this.handleNickName} placeholder="nickname"/>
-                    <TextField
-                                id="inputMessage"
-                                //label="메세지를 입력해주세요"
-                                //className={classes.textField}
-                                type='text' 
-                                
-                                name = 'inputMessage'
-                                onChange ={this.handleChatMessage}
-                                placeholder="message"
-                    />
-                    <input id="send-message" type = "submit" style = {{display: "none"}} />
-                    <label htmlFor="send-message" type= "submit" style = {{margin:"0px"}}>
-                        <Button variant="contained" color="primary" onClick = {this.chatMessageSendServer} size = {'small'}>
-                            Send
-                            <Icon>send</Icon>
-                        </Button>
-                    </label>
-                </form>
-                
+                <div className = 'inputBox'>
+                    <form onSubmit={this.chatMessageSendServer}>
+                        <input onChange ={this.handleNickName} placeholder="nickname"/>
+                        <TextField
+                                    id="inputMessage"
+                                    //label="메세지를 입력해주세요"
+                                    //className={classes.textField}
+                                    type='text' 
+                                    name = 'inputMessage'
+                                    onChange ={this.handleChatMessage}
+                                    placeholder="message"
+                        />
+                        <input id="send-message" type = "submit" style = {{display: "none"}} />
+                        <label htmlFor="send-message" type= "submit" style = {{margin:"0px"}}>
+                            <Button variant="contained" color="primary" onClick = {this.chatMessageSendServer} size = {'small'}>
+                                Send
+                                <Icon>send</Icon>
+                            </Button>
+                        </label>
+                    </form>
+                </div>
             </div>
         )
     }
