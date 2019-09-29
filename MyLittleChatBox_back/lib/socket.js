@@ -15,25 +15,32 @@ const connection = (io) =>{
     const namespaceChat = io.of('/chat');
     namespaceChat.on('connection',function(socket){
 
+        //방 가져오기 
         socket.on('getChatRoomList', function(data) {
-     
+            let roomList = userRedis.getChatRoomList();
+            console.log*+('[SEO] ROOMLIST ', roomList)
+            socket.emit('getChatRoomList', roomList)
         })
+        //방 들어가기 
         socket.on('joinChatRoom', function(data) {
-     
+            socket.join(data.roomId) //socketJoint
+        })
+        //방 나가기
+        socket.on('leaveChatRoom', function(data) {
+            socket.leave(data.roomId) //socketJoint
         })
 
+        //방만들고 방에 들어가기    
         socket.on('createChatRoom', function(data){
-            userRedis.createChatRoom(data);
+            let response = userRedis.createChatRoom(data);
+            console.log(response)
+            socket.join(data.roomId)
+            socket.to(data.roomId).emit('createChatRoom', { response : response })
+        })
 
-        })
-        
-        socket.on('getChatRoomList', function(data) {
-            userRedis.getChatRoomList(data)
-            //
-        })
 
         socket.on('getChatRoomMember', function(data) {
-            userRedis.getChatRoomMember(data)
+            let roomMembers = userRedis.getChatRoomMember(data)
         })
         socket.on('sendChatMessage',( data ) => {
             let messageInfo = {  
@@ -45,8 +52,25 @@ const connection = (io) =>{
             }
             console.log("[SEO] messageInfo", messageInfo)
             userRedis.addMessage(messageInfo)
-            socket.emit('getChatMessage', { messageInfo : messageInfo })
+            socket.to(messageInfo.roomId).emit('sendChatMessage', { messageInfo : messageInfo })
         })
+
+
+        //방 메세지 가져오기 
+        socket.on('getChatMessage',( data ) => {
+            let messageInfo = {  
+                message : data.message,  //채팅 메세지 
+                roomId : data.roomId,   // 룸_id 
+                socketId :  data.socketId, // 소켓 id 로 구분 함  
+                userId : data.userName,// 있으면 id, 없으면 null
+                userName : data.userName, //
+            }
+            console.log("[SEO] messageInfo", messageInfo)
+            //userRedis.addMessage(messageInfo)
+            //socket.to(messageInfo.roomId).emit('getChatMessage', { messageInfo : messageInfo })
+        })
+
+
 
     })
 

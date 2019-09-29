@@ -110,7 +110,7 @@ class AdminChat extends Component{
     }
     render() {
         let { roomSelect } = this.state; 
-        const { chatMessage } =this.props;
+        const { chatMessage, getChatRoomList } =this.props;
         console.log(this.state.roomList)
         let chatMessageList = chatMessage.map((item, i) =>{ 
             console.log(item)
@@ -134,7 +134,7 @@ class AdminChat extends Component{
         })
         return (
             <div className ='chatRooWrapper' height = "100%">
-
+                <button onClick = {getChatRoomList}>getChatRoomList</button>
                 <div className = {'roomList'} >
                     <form className = {'searchBox'} onSubmit={this.handleSearch}>
                         <SearchOutlinedIcon/>

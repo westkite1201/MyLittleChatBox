@@ -1,5 +1,6 @@
 const redishelpers = require('./redis');
 const util = require('util');
+const _  = require('lodash')
 
 const key_user_status = 'skb-user-status';
 
@@ -14,6 +15,29 @@ const key_component_info = 'ComponentInfo';
 const KEY_ROOM =  'CHAT_ROOM'
 const KEY_MESSAGE = 'CHAT_MESSAGE'
 
+const returnStatusCode = async(successYn, data ) => {
+  if(_.isNil(data)){
+    data = ''
+  }
+
+  let res = await successYn;
+  console.log(res)
+  let statusInfo = {
+    message : '',
+    statusCode : '',
+    data : data
+  }
+  if( successYn ){
+    statusInfo.message = "suceess"
+    statusInfo.statusCode = 200
+  }else{
+     statusInfo.message = "error"
+     statusInfo.statusCode = 400
+  }
+  return statusInfo;
+}
+
+
 //message add 
 const addMessage = (messageInfo) => {
   console.log("[SEO][redisDao]   messageInfo ", messageInfo)
@@ -26,31 +50,50 @@ const addMessage = (messageInfo) => {
 /* set 중복없는 value 값  */
 /* key = roomId + socketId */
 /* value socketId */
-const createChatRoom = (messageInfo) => {
+const createChatRoom = (data) => {
   const key = util.format("%s", KEY_ROOM);
-  redishelpers.redis.sadd(key, messageInfo.roomId); // roomList를 위해
+  console.log("[SEO][createChatRoom] ",data.messageInfo.roomId)
+  return  returnStatusCode( redishelpers.redis.sadd(key, data.messageInfo.roomId))// roomList를 위해
 }
-/*  */
+
+
+const getChatRoomList  = () => {
+  const key = util.format("%s", KEY_ROOM);
+  console.log("getChatRoomList", key)
+  return returnStatusCode(redishelpers.redis.smembers(key))
+}
+
+/* 방에 들어가기  */
 const joinChatRoom = (messageInfo) => {
   const key = util.format("%s:%s", KEY_ROOM, messageInfo.roomId);
   redishelpers.redis.sadd(key, messageInfo.socketId);
 }
-
-const getChatRoomList  = (messageInfo) => {
-  const key = util.format("%s:%s", KEY_ROOM);
-  return redishelpers.redis.smembers(key, smembers);
+/* 방에서 나가기  */
+/*  socketId에 해당되는 값 제거  */
+const leaveChatRoom  = (messageInfo) => {
+  const key = util.format("%s:%s", KEY_ROOM, messageInfo.roomId);
+  let socketId = data.socketId;
+  redishelpers.redis.srem(key, socketId);
+  
+  let memberCount = getChatRoomMember(messageInfo)
+  if( memberCount === 0 ){
+    distroyRoom();
+  }
 }
 
-/* */
+/*해당 room 제거  */
+const distroyRoom = (messageInfo) => {
+  redishelpers.redis.srem(KEY_ROOM, messageInfo.roomId);
+}
+
+
+/* 채팅방 멤버수 구하기  */
 const getChatRoomMember  = (messageInfo) => {
-  const key = util.format("%s:%s", KEY_ROOM, messageInfo.socketId);
-  return redishelpers.redis.smembers(key, smembers);
+  const key = util.format("%s:%s", KEY_ROOM, messageInfo.roomId);
+  return redishelpers.redis.smembers(key);
 }
 
-const leaveChatRoom  = () => {
-  let key = data.socketId;
-  return redishelpers.redis.rpush(key, message);
-}
+
 
 
 

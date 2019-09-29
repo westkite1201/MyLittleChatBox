@@ -47,15 +47,7 @@ class ChatView extends Component {
             nickName : e.target.value
         })
     }
-    /* 이걸 사용해서 이름을 만들 예정  */
-    createName = () =>{
-        let firstName= [];
-        let secondtName= [];
-        let lastName= [];
-    }
-    createRoom = () => { 
 
-    }
     getRoomList =() =>{
         const { getRoomList }  =this.props;
         getRoomList();
