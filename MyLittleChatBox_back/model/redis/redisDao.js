@@ -21,7 +21,8 @@ const returnStatusCode = async(successYn, data ) => {
   }
 
   let res = await successYn;
-  console.log(res)
+  console.log("res" , res)
+  data = res;
   let statusInfo = {
     message : '',
     statusCode : '',
@@ -34,6 +35,7 @@ const returnStatusCode = async(successYn, data ) => {
      statusInfo.message = "error"
      statusInfo.statusCode = 400
   }
+  console.log("status", statusInfo)
   return statusInfo;
 }
 
@@ -57,10 +59,12 @@ const createChatRoom = (data) => {
 }
 
 
-const getChatRoomList  = () => {
+const getChatRoomList  = async() => {
   const key = util.format("%s", KEY_ROOM);
   console.log("getChatRoomList", key)
-  return returnStatusCode(redishelpers.redis.smembers(key))
+  let resdata =  await returnStatusCode(redishelpers.redis.smembers(key))
+  console.log("getChatRoomList2 ", resdata)
+  return resdata;
 }
 
 /* 방에 들어가기  */

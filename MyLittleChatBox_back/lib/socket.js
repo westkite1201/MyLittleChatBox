@@ -16,9 +16,9 @@ const connection = (io) =>{
     namespaceChat.on('connection',function(socket){
 
         //방 가져오기 
-        socket.on('getChatRoomList', function(data) {
-            let roomList = userRedis.getChatRoomList();
-            console.log*+('[SEO] ROOMLIST ', roomList)
+        socket.on('getChatRoomList', async(data) => {
+            let roomList = await userRedis.getChatRoomList();
+            console.log('[SEO] ROOMLIST ', roomList)
             socket.emit('getChatRoomList', roomList)
         })
         //방 들어가기 
