@@ -31,11 +31,15 @@ export default class ChatStore{
     @action
     adminJoinRoom = (roomName) => { 
         console.log("adminJoinRoom!!")
+        console.log(roomName)
         if( chatMessageMap.has(roomName)){
+            console.log('have!')
             let chatMessage1 = chatMessageMap.get(roomName)
             console.log("chatMessage1!!" , chatMessage1)
             this.chatMessage = chatMessage1
         }else{
+            console.log('else')
+            console.log(chatMessageMap)
             this.chatMessage = []
         }
 
@@ -61,60 +65,62 @@ export default class ChatStore{
             console.log(this.socket)
        
 
-        // 서버로부터의 메시지가 수신되면
-        this.chatSocket.on("getChatMessage", (data) => {
-            console.log('[SEO] getChatMessage !!!', data)
-            let messageInfo = data.messageInfo
-            let isMe = false;
-            if(messageInfo.userName === 'ADMIN'){
-                isMe = true;
-            }
-            this.chatMessage.push({ userName: messageInfo.userName,
-                                    room: messageInfo.roomId,
-                                    message: messageInfo.message,
-                                })
+            // 서버로부터의 메시지가 수신되면
+            this.chatSocket.on("getChatMessage", (data) => {
+                console.log('[SEO] getChatMessage !!!', data)
+                let messageInfo = data.messageInfo
+                let isMe = false;
+                if(messageInfo.userName === 'ADMIN'){
+                    isMe = true;
+                }
+                this.chatMessage.push({ userName: messageInfo.userName,
+                                        room: messageInfo.roomId,
+                                        message: messageInfo.message,
+                                    })
 
 
-            console.log("data.room" , data.roomId)
-            console.log('chatMessageMap.get(data.room) ', chatMessageMap.get(data.roomId))
-           
-            // 저장
-            if(chatMessageMap.has(data.roomId)){
-                let temp = []
-                temp  = chatMessageMap.get(data.roomId) 
-                temp.push({ userName: messageInfo.userName,
-                            room: data.roomId,
-                            message: data.message,
-                            isMe: isMe })
-               // console.log(data)yarn
-                 chatMessageMap.set(data.roomId, temp)
-            }else{
-                console.log('else')
-                let temp = { userName: messageInfo.userName,
-                            room: data.roomId,
-                            message: data.message,
-                            isMe: isMe }
-                chatMessageMap.set(data.roomId, [temp])
-            }
+                console.log("data.room" , data.roomId)
+                console.log('messageInfo', messageInfo.roomId)
+                console.log('chatMessageMap.get(data.room) ', chatMessageMap.get(data.roomId))
+            
+                // 저장
+                if(chatMessageMap.has(data.roomId)){
+                    let temp = []
+                    temp  = chatMessageMap.get(data.roomId) 
+                    temp.push({ userName: messageInfo.userName,
+                                room: messageInfo.roomId,
+                                message: messageInfo.message,
+                                isMe: isMe })
+                // console.log(data)yarn
+                    console.log(data)
+                    chatMessageMap.set(messageInfo.roomId, temp)
+                }else{
+                    console.log('else')
+                    console.log(data)
+                    let temp = { userName: messageInfo.userName,
+                                room: messageInfo.roomId,
+                                message: messageInfo.message,
+                                isMe: isMe }
+                    chatMessageMap.set(messageInfo.roomId, [temp])
+                }
 
-           
+            
 
-        });
+            });
 
-        this.chatSocket.on("getChatRoomList", (data) =>{
-            this.roomNameList = data.roomNameList;
-            console.log(data.roomNameList)
-        })
-     
-            this.chatSocket.emit("disconnect", {
-                                                nickName: 'fsdfds',
-                                                room: 'all',
-                                            });
+            this.chatSocket.on("getChatRoomList", (data) =>{
+                this.roomNameList = data.roomNameList;
+                console.log(data.roomNameList)
+            })
         
+            this.chatSocket.emit("disconnect", {
+                nickName: 'fsdfds',
+                room: 'all',
+            });
+            
 
-            //시스템 메세지일때 
+                //시스템 메세지일때 
             this.chatSocket.on("system", (data) =>{
-
                 this.chatMessage.push({ 
                     nickName: data.nickName,
                     room: data.room,
@@ -122,7 +128,7 @@ export default class ChatStore{
                     system: true
                 })
 
-                // 저장
+                    // 저장
                 if(chatMessageMap.has(data.room)){
                     let temp = []
                     temp  = chatMessageMap.get(data.room) 

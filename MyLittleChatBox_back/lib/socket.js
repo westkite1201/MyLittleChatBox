@@ -68,7 +68,7 @@ const connection = (io) =>{
             let roomNameList = []
             for(let i = 0 ; i < socketID.length; i++){
                 roomNameList.push(socketIdList[socketID[i]])             
-            }       
+            }
 
             socket.emit('getChatRoomList', { roomNameList : roomNameList})
 

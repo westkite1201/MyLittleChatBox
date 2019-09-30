@@ -17,13 +17,11 @@ import { symbols } from 'ansi-colors';
 class AdminChat extends Component{
     @observable searchResult = [];
     @observable roomList = [];
+    @observable roomSelect = '';
     state = {
         nickName : 'SEOYEON',
         chatMsg : '',
         temp : [],
-        roomSelect : '',
-        searchResult:[],
-        roomList:[],
         //chatSocket : io('http://localhost:3031/chat')
     }
     componentDidMount(){
@@ -34,13 +32,12 @@ class AdminChat extends Component{
         //     getRoomList();
         // },1000)
     }
+    @action
     adminJoinRoom = (e) => {
         const {adminJoinRoom } =this.props;
         adminJoinRoom(e.target.name);
         console.log( e.target.name )   
-        this.setState({
-            roomSelect : e.target.name
-        })
+        this.roomSelect = e.target.name;
     }
        //인풋 박스 핸들링 
     handleChatMessage = (e) =>{
@@ -81,26 +78,8 @@ class AdminChat extends Component{
         }        
         console.log(roomNameList)
     }
-    // handleSearchKeyword = (e) => {
-    //     const { roomNameList } = this.props;
-    //     if(isEmpty(e.target.value)){
-    //         console.log('none')
-    //         this.setState({
-    //             searchResult:[],
-    //         })
-    //         console.log(this.state.searchResult)
-    //     }else{
-    //         this.setState({
-    //             searchResult: this.createListItem(roomNameList.filter(item=>{
-    //                 console.log(item.includes(e.target.value))
-    //                 return item.includes(e.target.value)
-    //             }))
-    //         })
-    //     }        
-    //     console.log(roomNameList)
-    // }
     createListItem = (list => {
-        const {roomSelect} = this.state
+        const {roomSelect} = this
         return list.map((item, i ) => {
             return(
                 <ListGroupItem className ={ roomSelect === item ? 'active' : 'unactive' }
@@ -116,20 +95,6 @@ class AdminChat extends Component{
     removeSearchResult = () => {
         this.searchResult = [];
     }
-    // removeSearchResult = (e) =>{
-    //     this.setState({
-    //         searchResult:[],
-    //     })
-    // }
-    // handleSearchCancel =(e) => {
-    //     console.log(e.key)
-    //     if(e.key === 'Escape'){
-    //         console.log(e.target.key)
-    //         this.setState({
-    //             searchResult:[],
-    //         })  
-    //     }
-    // }
     @action
     handleSearchCancel = (e) =>{
         console.log(e.key)
@@ -139,9 +104,7 @@ class AdminChat extends Component{
         }
     }
     render() {
-        let { roomSelect } = this.state; 
         const { chatMessage } =this.props;
-        console.log(this.state.roomList)
         console.log(this.props.roomNameList)
         let chatMessageList = chatMessage.map((item, i) =>{ 
             console.log(item)
