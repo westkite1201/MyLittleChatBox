@@ -48,6 +48,15 @@ const addMessage = (messageInfo) => {
   console.log("[SEO][redisDao] key , message", key, message)
   return redishelpers.redis.rpush(key, message);
 }
+
+//message add 
+const getChatMessage = (messageInfo) => {
+  console.log("[SEO][redisDao]   messageInfo ", messageInfo)
+  const key = util.format("%s:%s:%s", KEY_MESSAGE, messageInfo.roomId, messageInfo.socketId);
+  //let message = messageInfo.message;
+  console.log("[SEO][redisDao] key , message", key, message)
+  return redishelpers.redis.lrange(key, 10);
+}
 /* chatRoom 생성  */
 /* set 중복없는 value 값  */
 /* key = roomId + socketId */

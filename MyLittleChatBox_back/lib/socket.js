@@ -24,10 +24,15 @@ const connection = (io) =>{
         //방 들어가기 
         socket.on('joinChatRoom', function(data) {
             socket.join(data.roomId) //socketJoint
+
+            userRedis.joinChatRoom(data);
         })
         //방 나가기
         socket.on('leaveChatRoom', function(data) {
             socket.leave(data.roomId) //socketJoint
+            
+            userRedis.leaveChatRoom(data);
+         
         })
 
         //방만들고 방에 들어가기    

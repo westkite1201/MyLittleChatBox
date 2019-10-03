@@ -44,8 +44,14 @@ export default class ChatStore {
         socketId : socketId,
         userId : socketId + "_0",
         userName : this.nicknameMaker(),
-    } 
-    localStorage.setItem('socketid', socketId);
+    }
+    /* 기존 소켓 id가 있다면  */
+    if(localStorage.getItem('socketId')){
+      let settingSocketId= localStorage.getItem('socketId');
+      localStorage.setItem('socketid',settingSocketId);
+    }else{ //없다면 setting
+      localStorage.setItem('socketid', socketId);
+    }
     this.userInfo = userInfo;
   }
   //client 방 만들기 
