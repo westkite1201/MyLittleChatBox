@@ -31,14 +31,6 @@ class AdminChat extends Component{
         //     getRoomList();
         // },1000)
     }
-    adminJoinRoom = (e) => {
-        const {adminJoinRoom } =this.props;
-        adminJoinRoom(e.target.name);
-        console.log( e.target.name )   
-        // this.setState({
-        //     roomSelect : e.target.name
-        // })
-    }
        //인풋 박스 핸들링 
     handleChatMessage = (e) =>{
         console.log(this.state.chatMsg)
@@ -59,7 +51,6 @@ class AdminChat extends Component{
         console.log("handleSearch##")
         e.preventDefault();
         const { roomNameList } = this.props
-        
         document.getElementById('input-with-icon-textfield').value = ''
 
     }
@@ -82,13 +73,13 @@ class AdminChat extends Component{
         console.log(roomNameList)
     }
     createListItem = list => {
-        const { adminJoinRoom,
+        const { joinChatRoom,
                 selectRoomId } = this.props;
         return list.map((item, i ) => {
             return(
                 <ListGroupItem className = { selectRoomId === item ? 'active' : 'unactive' }
                                tag="button" 
-                               onClick ={adminJoinRoom}
+                               onClick ={joinChatRoom}
                                key = {i}
                                name={item} >{item}
                 </ListGroupItem>
@@ -113,7 +104,7 @@ class AdminChat extends Component{
         const { chatMessage, 
                 roomNameList,
                 getChatRoomList, 
-                deleteRedisKey } =this.props;
+                deleteRedisKey } = this.props;
         console.log(this.state.roomList)
         let chatMessageList = chatMessage.map((item, i) =>{ 
             console.log(item)
@@ -195,6 +186,6 @@ export default inject(({ chat }) => ({
     setSocketConnection : chat.setSocketConnection,
     sendChatMessage : chat.sendChatMessage,
     chatMessage : chat.chatMessage,
-    adminJoinRoom : chat.adminJoinRoom,
+    joinChatRoom : chat.joinChatRoom,
     deleteRedisKey : chat.deleteRedisKey
   }))(observer( AdminChat));

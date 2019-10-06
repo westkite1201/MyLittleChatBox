@@ -104,9 +104,10 @@ export default class ChatStore {
 
   //admin 입장
   @action
-  adminJoinRoom = e => {
-    console.log("[SEO] adminJoinRoom " , e)
+  joinChatRoom = e => {
+    console.log("[SEO] adminJoinRoom " , e.target.name)
     this.selectRoomId = e.target.name;
+    this.chatSocket.emit('joinChatRoom',{messageInfo: { roomId : e.target.name}})
   };
 
   @action

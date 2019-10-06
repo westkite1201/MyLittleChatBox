@@ -24,6 +24,10 @@ class ChatView extends Component {
         console.log("[SEO][ChatView] componentDidMount")
        // getRoomList();
     }
+    /* 나가기  */
+    componentWillMount(){
+
+    }
 
     //서버로 전송 
     chatMessageSendServer = (e) => {
