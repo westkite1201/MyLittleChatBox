@@ -38,7 +38,10 @@ const returnStatusCode = async(successYn, data ) => {
   //console.log("status", statusInfo)
   return statusInfo;
 }
-
+/* 레디스 키 제거 */ 
+const deleteRedisKey = () => {
+  redishelpers.redis.del(KEY_ROOM)
+}
 
 //message add 
 const addMessage = (messageInfo) => {
@@ -330,6 +333,7 @@ module.exports = {
 
   //key 
   //CHAT 함수 
+  deleteRedisKey : deleteRedisKey,
   getChatMessage : getChatMessage,
   addMessage: addMessage,
   createChatRoom : createChatRoom,

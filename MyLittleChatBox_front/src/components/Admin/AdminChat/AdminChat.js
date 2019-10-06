@@ -35,9 +35,9 @@ class AdminChat extends Component{
         const {adminJoinRoom } =this.props;
         adminJoinRoom(e.target.name);
         console.log( e.target.name )   
-        this.setState({
-            roomSelect : e.target.name
-        })
+        // this.setState({
+        //     roomSelect : e.target.name
+        // })
     }
        //인풋 박스 핸들링 
     handleChatMessage = (e) =>{
@@ -81,19 +81,20 @@ class AdminChat extends Component{
         }        
         console.log(roomNameList)
     }
-    createListItem = (list => {
-        const {roomSelect} = this.state
+    createListItem = list => {
+        const { adminJoinRoom,
+                selectRoomId } = this.props;
         return list.map((item, i ) => {
             return(
-                <ListGroupItem className ={ roomSelect === item ? 'active' : 'unactive' }
+                <ListGroupItem className = { selectRoomId === item ? 'active' : 'unactive' }
                                tag="button" 
-                               onClick ={this.adminJoinRoom}
+                               onClick ={adminJoinRoom}
                                key = {i}
                                name={item} >{item}
                 </ListGroupItem>
             )
         })
-    })
+    }
     removeSearchResult = (e) =>{
         this.setState({
             searchResult:[],
@@ -109,8 +110,10 @@ class AdminChat extends Component{
         }
     }
     render() {
-        let { roomSelect } = this.state; 
-        const { chatMessage, getChatRoomList } =this.props;
+        const { chatMessage, 
+                roomNameList,
+                getChatRoomList, 
+                deleteRedisKey } =this.props;
         console.log(this.state.roomList)
         let chatMessageList = chatMessage.map((item, i) =>{ 
             console.log(item)
@@ -129,12 +132,12 @@ class AdminChat extends Component{
                 !item.isMe ?
                 <ChatItem/> : 
                 <div className = {messageClassName} >{item.userName+ ": " + item.message }</div>
-             
             )
         })
         return (
             <div className ='chatRooWrapper' height = "100%">
                 <button onClick = {getChatRoomList}>getChatRoomList</button>
+                <button onClick = {deleteRedisKey}>deleteRedisKey</button>
                 <div className = {'roomList'} >
                     <form className = {'searchBox'} onSubmit={this.handleSearch}>
                         <SearchOutlinedIcon/>
@@ -150,7 +153,7 @@ class AdminChat extends Component{
                         {this.state.searchResult}
                     </ListGroup>
                     <ListGroup>
-                        {this.createListItem(this.props.roomNameList)}
+                        {this.createListItem(roomNameList)}
                     </ListGroup>
                 </div>
                 <div className = {'chatRoom'} >
@@ -185,10 +188,13 @@ class AdminChat extends Component{
 }
 
 export default inject(({ chat }) => ({
+    selectRoomId : chat.selectRoomId,
+    roomNameList : chat.roomNameList,
     getChatRoomList : chat.getChatRoomList,
     roomNameList : chat.roomNameList,
     setSocketConnection : chat.setSocketConnection,
     sendChatMessage : chat.sendChatMessage,
     chatMessage : chat.chatMessage,
-    adminJoinRoom : chat.adminJoinRoom
+    adminJoinRoom : chat.adminJoinRoom,
+    deleteRedisKey : chat.deleteRedisKey
   }))(observer( AdminChat));

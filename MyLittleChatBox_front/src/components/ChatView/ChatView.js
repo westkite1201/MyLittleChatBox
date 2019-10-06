@@ -1,11 +1,13 @@
 import React, { Component } from 'react'
 import { observer, inject, } from 'mobx-react'
 import ChatItem from './ChatItem'
+import _ from 'lodash'
 import './ChatView.scss'
 import TextField from '@material-ui/core/TextField';
 import Button from '@material-ui/core/Button';
 import Icon from '@material-ui/core/Icon';
 
+/* Client Chat View  */
 class ChatView extends Component {
 
     state = {
@@ -53,14 +55,18 @@ class ChatView extends Component {
         getRoomList();
     }
     render() {
-        const { chatMessage, getRoomList, chatMessageMap}  =this.props;
-        console.log("chatMessage ", chatMessage)
-
-        console.log( "[SEO] " , chatMessageMap.get(localStorage.getItem('roomId'))); 
-        let chatMessageList = chatMessage.map((item, i) => { 
+        const { chatMessageMap,
+              selectRoomId }  =this.props;
+        
+        console.log( "[SEO] selectRoomId" ,selectRoomId, chatMessageMap.get(selectRoomId));
+        let chatMessageList = []
+        if(!_.isNil(chatMessageMap.get(selectRoomId))){
+            chatMessageList = chatMessageMap.get(selectRoomId)
+        }
+        let chatMessage = chatMessageList.map((item, i) => { 
             return (
-                <ChatItem nickName =  {item.nickName}
-                          message ={item.msg}
+                <ChatItem userName =  {item.userName}
+                          message ={item.message}
                           key = {i}
                 />  
             )
@@ -68,7 +74,7 @@ class ChatView extends Component {
         return (
             <div className = 'chatViewWrapper'>
                 <div className = 'messageWrapper'>
-                    {chatMessageList}
+                    {chatMessage}
                 </div>
                 <form onSubmit={this.chatMessageSendServer}>
                     <input onChange ={this.handleNickName} placeholder="nickname"/>
@@ -103,5 +109,6 @@ export default inject(({ chat }) => ({
     setSocketConnection : chat.setSocketConnection,
     sendChatMessage : chat.sendChatMessage,
     chatMessageMap : chat.chatMessageMap,
-    chatMessage : chat.chatMessage
+    chatMessage : chat.chatMessage,
+    selectRoomId : chat.selectRoomId
   }))(observer( ChatView));

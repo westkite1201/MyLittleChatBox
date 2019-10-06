@@ -28,7 +28,7 @@ const styles = (theme) => ({
 @observer
 class ChatItem extends Component{
     render(){
-        const { classes, nickName, message } = this.props;
+        const { classes, userName, message } = this.props;
         return (
             <List className={classes.root}>
             <ListItem alignItems="flex-start" className ={classes.chatItem}>
@@ -36,20 +36,20 @@ class ChatItem extends Component{
                   <Avatar alt="Remy Sharp" src="/images/defaultUserIcon.png" />
                 </ListItemAvatar>
                 <ListItemText
-                primary={nickName}
-                secondary={
-                    <React.Fragment>
-                    <Typography
-                        component="span"
-                        variant="body2"
-                        className={classes.inline}
-                        color="textPrimary"
-                    >
-                    {message}
-                    </Typography>
-                   
-                    </React.Fragment>
-                }
+                  primary={userName}
+                  secondary={
+                      <React.Fragment>
+                      <Typography
+                          component="span"
+                          variant="body2"
+                          className={classes.inline}
+                          color="textPrimary"
+                      >
+                      {message}
+                      </Typography>
+                    
+                      </React.Fragment>
+                  }
                 />
             </ListItem>
             <Divider variant="inset" component="li" />
