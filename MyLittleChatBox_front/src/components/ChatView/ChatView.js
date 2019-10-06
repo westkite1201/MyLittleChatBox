@@ -53,9 +53,11 @@ class ChatView extends Component {
         getRoomList();
     }
     render() {
-        const { chatMessage, getRoomList }  =this.props;
+        const { chatMessage, getRoomList, chatMessageMap}  =this.props;
         console.log("chatMessage ", chatMessage)
-        let chatMessageList = chatMessage.map((item, i) =>{ 
+
+        console.log( "[SEO] " , chatMessageMap.get(localStorage.getItem('roomId'))); 
+        let chatMessageList = chatMessage.map((item, i) => { 
             return (
                 <ChatItem nickName =  {item.nickName}
                           message ={item.msg}
@@ -100,5 +102,6 @@ export default inject(({ chat }) => ({
     joinRoom  : chat.joinRoom,
     setSocketConnection : chat.setSocketConnection,
     sendChatMessage : chat.sendChatMessage,
+    chatMessageMap : chat.chatMessageMap,
     chatMessage : chat.chatMessage
   }))(observer( ChatView));

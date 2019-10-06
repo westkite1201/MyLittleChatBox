@@ -21,7 +21,7 @@ const returnStatusCode = async(successYn, data ) => {
   }
 
   let res = await successYn;
-  console.log("res" , res)
+ // console.log("res" , res)
   data = res;
   let statusInfo = {
     message : '',
@@ -35,7 +35,7 @@ const returnStatusCode = async(successYn, data ) => {
      statusInfo.message = "error"
      statusInfo.statusCode = 400
   }
-  console.log("status", statusInfo)
+  //console.log("status", statusInfo)
   return statusInfo;
 }
 
@@ -63,16 +63,16 @@ const getChatMessage = (messageInfo) => {
 /* value socketId */
 const createChatRoom = (data) => {
   const key = util.format("%s", KEY_ROOM);
-  console.log("[SEO][createChatRoom] ",data.messageInfo.roomId)
+  //console.log("[SEO][createChatRoom] ",data.messageInfo.roomId)
   return  returnStatusCode( redishelpers.redis.sadd(key, data.messageInfo.roomId))// roomList를 위해
 }
 
 
 const getChatRoomList  = async() => {
   const key = util.format("%s", KEY_ROOM);
-  console.log("getChatRoomList", key)
+  //console.log("getChatRoomList", key)
   let resdata =  await returnStatusCode(redishelpers.redis.smembers(key))
-  console.log("getChatRoomList2 ", resdata)
+  //console.log("getChatRoomList2 ", resdata)
   return resdata;
 }
 
@@ -330,12 +330,14 @@ module.exports = {
 
   //key 
   //CHAT 함수 
+  getChatMessage : getChatMessage,
   addMessage: addMessage,
   createChatRoom : createChatRoom,
   getChatRoomList : getChatRoomList,
   getChatRoomMember :getChatRoomMember,
   joinChatRoom : joinChatRoom,
   leaveChatRoom  : leaveChatRoom,
+
 
   // Expire Test
   //expireTest: expireTest,

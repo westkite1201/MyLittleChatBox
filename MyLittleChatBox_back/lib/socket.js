@@ -9,21 +9,38 @@ let roomList = []
 
 
 
-
+let roomId = ''
+let socketId = '';
 const connection = (io) =>{
-    const nsp = io.of('/chat');
     const namespaceChat = io.of('/chat');
     namespaceChat.on('connection',function(socket){
+        console.log("socket connection ")
 
         //방 가져오기 
         socket.on('getChatRoomList', async(data) => {
+            console.log("'[SEO] getChatRoomList" , roomId)
             let roomList = await userRedis.getChatRoomList();
-            console.log('[SEO] ROOMLIST ', roomList)
-            socket.emit('getChatRoomList', roomList)
+           // console.log('[SEO] ROOMLIST ', roomList)
+            //socket.to(roomId).emit('getChatRoomList', roomList)
+            socket.join(roomId)
+    
+            console.log(socket.rooms)
+            socket.emit('getChatRoomList', "일반")
+
+            socket.broadcast.emit('getChatRoomList', "this is a test");
+            socket.broadcast.to(roomId).emit('getChatRoomList', '브로드케스트')
+            socket.to(roomId).emit('getChatRoomList',  "room에보냄 ")
+            io.emit('getChatRoomList', "this is a test dd");
+            io.sockets.in(roomId).emit('getChatRoomList', '슈발')
+            io.in(roomId).emit('getChatRoomList','ㅅㅂ')
+    
+       
+            //socket.emit('getChatRoomList', roomList)
         })
         //방 들어가기 
         socket.on('joinChatRoom', function(data) {
-            socket.join(data.roomId) //socketJoint
+            console.log("[SEO][joinChatRoom] ", data)
+            socket.join(data.messageInfo.roomId) //socketJoint
 
             userRedis.joinChatRoom(data);
         })
@@ -37,10 +54,15 @@ const connection = (io) =>{
 
         //방만들고 방에 들어가기    
         socket.on('createChatRoom', function(data){
+            console.log("createChatRoom ",data.messageInfo.socketId )
+            roomId = data.messageInfo.roomId
+            socketId = data.messageInfo.socketId
             let response = userRedis.createChatRoom(data);
             console.log(response)
-            socket.join(data.roomId)
-            socket.to(data.roomId).emit('createChatRoom', { response : response })
+
+            socket.join(roomId)
+            socket.to(roomId).emit('createChatRoom', { response : response })
+        
         })
 
 
