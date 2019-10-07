@@ -13,6 +13,7 @@ const styles = (theme) => ({
   root: {
     width: '100%',
     maxWidth: 360,
+    float : 'left',
     //backgroundColor: theme.palette.background.paper,
   },
   inline: {

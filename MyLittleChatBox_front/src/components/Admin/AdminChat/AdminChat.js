@@ -106,6 +106,10 @@ class AdminChat extends Component{
                 getChatRoomList, 
                 deleteRedisKey } = this.props;
         console.log(this.state.roomList)
+
+
+
+        
         let chatMessageList = chatMessage.map((item, i) =>{ 
             console.log(item)
             let messageClassName ;

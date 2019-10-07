@@ -26,8 +26,7 @@ const connection = (io) =>{
         //방 들어가기 
         socket.on('joinChatRoom', function(data) {
             console.log("[SEO][joinChatRoom] ", data)
-            socket.join(data.messageInfo.roomId) //socketJoint
-
+            socket.join(data.messageInfo.roomId) //socketJoin
             userRedis.joinChatRoom(data);
         })
         //방 나가기
@@ -36,8 +35,6 @@ const connection = (io) =>{
             userRedis.leaveChatRoom(data);
         })
 
-
-        
         //방만들고 방에 들어가기    
         socket.on('createChatRoom', function(data){
             console.log("createChatRoom ",data.messageInfo.socketId )

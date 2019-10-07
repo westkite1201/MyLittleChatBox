@@ -68,13 +68,29 @@ class ChatView extends Component {
             chatMessageList = chatMessageMap.get(selectRoomId)
         }
         let chatMessage = chatMessageList.map((item, i) => { 
+            let messageClassName ;
+            if(item.system){
+                messageClassName = 'systemMessage'
+            }else{
+                if(item.isMe){
+                    messageClassName = 'myMessage'
+                }else if(!item.isMe){
+                    messageClassName = 'anotherUserMessage'
+                }
+            }
             return (
+                !item.isMe ? 
                 <ChatItem userName =  {item.userName}
                           message ={item.message}
                           key = {i}
-                />  
+                />  :
+                <div className = {messageClassName}>
+                    {item.userName+ ": " + item.message }
+                </div> 
             )
         })
+
+
         return (
             <div className = 'chatViewWrapper'>
                 <div className = 'messageWrapper'>

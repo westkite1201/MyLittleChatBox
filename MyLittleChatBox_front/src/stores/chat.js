@@ -87,14 +87,12 @@ export default class ChatStore {
     });
     this.selectRoomId = roomId;
   }
-  //joinRoom , 입장함
-  //현재는 admin만 입장 가능함
-
+  /* leaveRoom 에 대한 정책 필요 함  */
   @action
-  joinRoom = () => {
-    this.chatSocket.emit("clientJoinRoom", {
-    });
-  };
+  leaveRoom = () => {
+    
+  }
+
 
   @action
   getChatRoomList = () => {
@@ -107,7 +105,7 @@ export default class ChatStore {
   joinChatRoom = e => {
     console.log("[SEO] adminJoinRoom " , e.target.name)
     this.selectRoomId = e.target.name;
-    this.chatSocket.emit('joinChatRoom',{messageInfo: { roomId : e.target.name}})
+    this.chatSocket.emit('joinChatRoom', { messageInfo: { roomId : e.target.name}})
   };
 
   @action
@@ -146,10 +144,10 @@ export default class ChatStore {
       this.chatSocket.on("sendChatMessage" , data =>{
         console.log("[SEO] sendChatMessage -> serverRecive " , data)
         const {chatMessageMap} = this;
-        let mySocketId = localStorage.getItem('socketId')
-
+       // let mySocketId = localStorage.getItem('socketId')
+        const { socketId } = this.userInfo;
         let isMe = false;
-        if( mySocketId === data.socketId){ //isMe
+        if( socketId === data.socketId){ //isMe
             isMe = true;
         }
 
@@ -200,10 +198,13 @@ export default class ChatStore {
           userInfo,
           selectRoomId } = this;
 
+
     if(userName === 'ADMIN'){ //임시 
       userInfo.userName = 'ADMIN'
       userInfo.userId = 'ADMIN'
     }
+
+    
     //admin만 selectRoomId 가 있을것 
     let chatMessage = {
       message : message,  //채팅 메세지 
@@ -211,6 +212,7 @@ export default class ChatStore {
       socketId : this.chatSocket.id, // 소켓 id 로 구분 함  
       userId : userInfo.userName,// 있으면 id, 없으면 null
       userName :userInfo.userName, //
+      isMe : true // sendMessage 는 무조건 나
     }
     
     //현재 방에 메세지가 있다면 
