@@ -31,16 +31,6 @@ class AdminChat extends Component{
         //     getChatRoomList();
         // },1000)
     }
-<<<<<<< HEAD
-    @action
-    adminJoinRoom = (e) => {
-        const {adminJoinRoom } =this.props;
-        adminJoinRoom(e.target.name);
-        console.log( e.target.name )   
-        this.roomSelect = e.target.name;
-    }
-=======
->>>>>>> feature/redis-connect
        //인풋 박스 핸들링 
     handleChatMessage = (e) =>{
         console.log(this.state.chatMsg)
@@ -79,14 +69,9 @@ class AdminChat extends Component{
         }        
         console.log(roomNameList)
     }
-<<<<<<< HEAD
-    createListItem = (list => {
-        const {roomSelect} = this
-=======
     createListItem = list => {
         const { joinChatRoom,
                 selectRoomId } = this.props;
->>>>>>> feature/redis-connect
         return list.map((item, i ) => {
             return(
                 <ListGroupItem className = { selectRoomId === item ? 'active' : 'unactive' }
@@ -97,18 +82,11 @@ class AdminChat extends Component{
                 </ListGroupItem>
             )
         })
-<<<<<<< HEAD
-    })
-    @action
-    removeSearchResult = () => {
-        this.searchResult = [];
-=======
     }
     removeSearchResult = (e) =>{
         this.setState({
             searchResult:[],
         })
->>>>>>> feature/redis-connect
     }
     @action
     handleSearchCancel = (e) =>{
@@ -119,13 +97,6 @@ class AdminChat extends Component{
         }
     }
     render() {
-<<<<<<< HEAD
-        const { chatMessage } =this.props;
-        console.log(this.props.roomNameList)
-        let chatMessageList = chatMessage.map((item, i) =>{ 
-            console.log(item)
-            console.log(item.message)
-=======
          const { chatMessageMap,
               selectRoomId,
               getChatRoomList,
@@ -138,7 +109,6 @@ class AdminChat extends Component{
             chatMessageList = chatMessageMap.get(selectRoomId)
         }
         let chatMessage = chatMessageList.map((item, i) => { 
->>>>>>> feature/redis-connect
             let messageClassName ;
             if(item.system){
                 messageClassName = 'systemMessage'
@@ -150,14 +120,6 @@ class AdminChat extends Component{
                 }
             }
             return (
-<<<<<<< HEAD
-                !item.isMe ?
-                <ChatItem key = {i} nickName = {item.userName} message = {item.message}/> : 
-                <div className = {messageClassName} key = {i} >
-                    {item.userName+ ": " + item.message }
-                </div>
-             
-=======
                 !item.isMe ? 
                 <ChatItem userName =  {item.userName}
                           message ={item.message}
@@ -166,7 +128,6 @@ class AdminChat extends Component{
                 <div className = {messageClassName}>
                     {item.userName+ ": " + item.message }
                 </div> 
->>>>>>> feature/redis-connect
             )
         })
 

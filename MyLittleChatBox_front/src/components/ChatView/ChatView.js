@@ -75,12 +75,8 @@ class ChatView extends Component {
                 }
             }
             return (
-<<<<<<< HEAD
-                <ChatItem nickName =  {item.userName}
-=======
                 !item.isMe ? 
                 <ChatItem userName =  {item.userName}
->>>>>>> feature/redis-connect
                           message ={item.message}
                           key = {i}
                 />  :
@@ -96,29 +92,6 @@ class ChatView extends Component {
                 <div className = 'messageWrapper'>
                     {chatMessage}
                 </div>
-<<<<<<< HEAD
-                <div className = 'inputBox'>
-                    <form onSubmit={this.chatMessageSendServer}>
-                        <input onChange ={this.handleNickName} placeholder="nickname"/>
-                        <TextField
-                                    id="inputMessage"
-                                    //label="메세지를 입력해주세요"
-                                    //className={classes.textField}
-                                    type='text' 
-                                    name = 'inputMessage'
-                                    onChange ={this.handleChatMessage}
-                                    placeholder="message"
-                        />
-                        <input id="send-message" type = "submit" style = {{display: "none"}} />
-                        <label htmlFor="send-message" type= "submit" style = {{margin:"0px"}}>
-                            <Button variant="contained" color="primary" onClick = {this.chatMessageSendServer} size = {'small'}>
-                                Send
-                                <Icon>send</Icon>
-                            </Button>
-                        </label>
-                    </form>
-                </div>
-=======
                 <form onSubmit={this.chatMessageSendServer}>
                     <TextField
                                 id="inputMessage"
@@ -139,7 +112,6 @@ class ChatView extends Component {
                     </label>
                 </form>
                 
->>>>>>> feature/redis-connect
             </div>
         )
     }
