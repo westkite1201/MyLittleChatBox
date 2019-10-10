@@ -4,6 +4,30 @@
         max-height: calc(100% - 80px);
         min-height: calc(100% - 80px);
         overflow: auto;
+        .myMessage{
+            margin: 0.3rem;
+            min-width: 200px;
+            max-width: 400px;
+            float : right;
+            display: block;
+            background-color: rgba(235, 235, 8, 0.796);
+            clear:both;
+            border-radius: 0.5rem;
+            padding: 10px;
+            word-break: break-all;
+        }   
+        .anotherUserMessage{
+            margin: 0.3rem;
+            min-width: 200px;
+            max-width: 400px;
+            float: left;
+            display: block;
+            background-color: gainsboro;
+            clear:both;
+            border-radius: 0.5rem;
+            padding: 10px;
+            word-break: break-all;
+        }
     }
     .MuiTextField-root	{
         height: 40px;
@@ -12,7 +36,21 @@
     .MuiButton-root	{
         height: 40px;
     }
+<<<<<<< HEAD
     .inputBox{
         height: calc(100% -70px);
     }
 }
+=======
+}
+
+// .message{
+//     padding: 10px;
+//     max-height: calc(100% - 50px);
+//     height: calc(100% - 50px);
+//     min-width: 300px;
+//     /* overflow-y: hidden; */
+//     overflow: auto ;
+
+//}
+>>>>>>> feature/redis-connect

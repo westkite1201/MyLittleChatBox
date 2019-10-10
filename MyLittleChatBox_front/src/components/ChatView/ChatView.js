@@ -1,24 +1,30 @@
 import React, { Component } from 'react'
 import { observer, inject, } from 'mobx-react'
 import ChatItem from './ChatItem'
+import _ from 'lodash'
 import './ChatView.scss'
 import TextField from '@material-ui/core/TextField';
 import Button from '@material-ui/core/Button';
 import Icon from '@material-ui/core/Icon';
 
+/* Client Chat View  */
 class ChatView extends Component {
 
     state = {
-        nickName : 'user',
         chatMsg : '',
         //chatSocket : io('http://localhost:3031/chat')
     }
     componentDidMount(){
-        const { setSocketConnection,getRoomList,joinRoom } = this.props;
-        setSocketConnection();
-        joinRoom(this.state.nickName);
+        const { setSocketConnection,
+                 } = this.props;
+
+         setSocketConnection();
+        console.log("[SEO][ChatView] componentDidMount")
        // getRoomList();
-       // this.setSocketConnection(); 
+    }
+    /* 나가기  */
+    componentWillMount(){
+
     }
 
     //서버로 전송 
@@ -43,40 +49,54 @@ class ChatView extends Component {
             chatMsg : e.target.value
         })
     }
-    handleNickName = (e) =>{
-        this.setState({
-            nickName : e.target.value
-        })
-    }
-    /* 이걸 사용해서 이름을 만들 예정  */
-    createName = () =>{
-        let firstName= [];
-        let secondtName= [];
-        let lastName= [];
-    }
-    createRoom = () => { 
 
-    }
     getRoomList =() =>{
         const { getRoomList }  =this.props;
         getRoomList();
     }
     render() {
-        const { chatMessage, getRoomList }  =this.props;
-        console.log("chatMessage ", chatMessage)
-        let chatMessageList = chatMessage.map((item, i) =>{ 
+        const { chatMessageMap,
+              selectRoomId }  =this.props;
+        
+        console.log( "[SEO] selectRoomId" ,selectRoomId, chatMessageMap.get(selectRoomId));
+        let chatMessageList = []
+        if(!_.isNil(chatMessageMap.get(selectRoomId))){
+            chatMessageList = chatMessageMap.get(selectRoomId)
+        }
+        let chatMessage = chatMessageList.map((item, i) => { 
+            let messageClassName ;
+            if(item.system){
+                messageClassName = 'systemMessage'
+            }else{
+                if(item.isMe){
+                    messageClassName = 'myMessage'
+                }else if(!item.isMe){
+                    messageClassName = 'anotherUserMessage'
+                }
+            }
             return (
+<<<<<<< HEAD
                 <ChatItem nickName =  {item.userName}
+=======
+                !item.isMe ? 
+                <ChatItem userName =  {item.userName}
+>>>>>>> feature/redis-connect
                           message ={item.message}
                           key = {i}
-                />  
+                />  :
+                <div className = {messageClassName}>
+                    {item.userName+ ": " + item.message }
+                </div> 
             )
         })
+
+
         return (
             <div className = 'chatViewWrapper'>
                 <div className = 'messageWrapper'>
-                    {chatMessageList}
+                    {chatMessage}
                 </div>
+<<<<<<< HEAD
                 <div className = 'inputBox'>
                     <form onSubmit={this.chatMessageSendServer}>
                         <input onChange ={this.handleNickName} placeholder="nickname"/>
@@ -98,14 +118,40 @@ class ChatView extends Component {
                         </label>
                     </form>
                 </div>
+=======
+                <form onSubmit={this.chatMessageSendServer}>
+                    <TextField
+                                id="inputMessage"
+                                //label="메세지를 입력해주세요"
+                                //className={classes.textField}
+                                type='text' 
+                                
+                                name = 'inputMessage'
+                                onChange ={this.handleChatMessage}
+                                placeholder="message"
+                    />
+                    <input id="send-message" type = "submit" style = {{display: "none"}} />
+                    <label htmlFor="send-message" type= "submit" style = {{margin:"0px"}}>
+                        <Button variant="contained" color="primary" onClick = {this.chatMessageSendServer} size = {'small'}>
+                            Send
+                            <Icon>send</Icon>
+                        </Button>
+                    </label>
+                </form>
+                
+>>>>>>> feature/redis-connect
             </div>
         )
     }
 }
 export default inject(({ chat }) => ({
+    createChatRoom : chat.createChatRoom,
+    initUserInfo : chat.initUserInfo,
     getRoomList : chat.getRoomList,
     joinRoom  : chat.joinRoom,
     setSocketConnection : chat.setSocketConnection,
     sendChatMessage : chat.sendChatMessage,
-    chatMessage : chat.chatMessage
+    chatMessageMap : chat.chatMessageMap,
+    chatMessage : chat.chatMessage,
+    selectRoomId : chat.selectRoomId
   }))(observer( ChatView));

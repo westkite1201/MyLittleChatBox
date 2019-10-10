@@ -6,13 +6,12 @@ import TextField from '@material-ui/core/TextField';
 import ChatItem from  '../../ChatView/ChatItem'
 
 import SearchOutlinedIcon from '@material-ui/icons/SearchOutlined';
-
+import _ from 'lodash'
 import Button from '@material-ui/core/Button';
 import Icon from '@material-ui/core/Icon';
 import {isEmpty} from 'lodash'
 import ClearSharpIcon from '@material-ui/icons/ClearSharp';
 import './AdminChat.scss';
-import { symbols } from 'ansi-colors';
 
 class AdminChat extends Component{
     @observable searchResult = [];
@@ -25,13 +24,14 @@ class AdminChat extends Component{
         //chatSocket : io('http://localhost:3031/chat')
     }
     componentDidMount(){
-        const { getRoomList, setSocketConnection }  =this.props;
+        const { getChatRoomList, setSocketConnection }  =this.props;
         setSocketConnection('admin')
-        getRoomList();
+        getChatRoomList();
         // setInterval(()=>{
-        //     getRoomList();
+        //     getChatRoomList();
         // },1000)
     }
+<<<<<<< HEAD
     @action
     adminJoinRoom = (e) => {
         const {adminJoinRoom } =this.props;
@@ -39,6 +39,8 @@ class AdminChat extends Component{
         console.log( e.target.name )   
         this.roomSelect = e.target.name;
     }
+=======
+>>>>>>> feature/redis-connect
        //인풋 박스 핸들링 
     handleChatMessage = (e) =>{
         console.log(this.state.chatMsg)
@@ -59,7 +61,6 @@ class AdminChat extends Component{
         console.log("handleSearch##")
         e.preventDefault();
         const { roomNameList } = this.props
-        
         document.getElementById('input-with-icon-textfield').value = ''
 
     }
@@ -78,22 +79,36 @@ class AdminChat extends Component{
         }        
         console.log(roomNameList)
     }
+<<<<<<< HEAD
     createListItem = (list => {
         const {roomSelect} = this
+=======
+    createListItem = list => {
+        const { joinChatRoom,
+                selectRoomId } = this.props;
+>>>>>>> feature/redis-connect
         return list.map((item, i ) => {
             return(
-                <ListGroupItem className ={ roomSelect === item ? 'active' : 'unactive' }
+                <ListGroupItem className = { selectRoomId === item ? 'active' : 'unactive' }
                                tag="button" 
-                               onClick ={this.adminJoinRoom}
+                               onClick ={joinChatRoom}
                                key = {i}
                                name={item} >{item}
                 </ListGroupItem>
             )
         })
+<<<<<<< HEAD
     })
     @action
     removeSearchResult = () => {
         this.searchResult = [];
+=======
+    }
+    removeSearchResult = (e) =>{
+        this.setState({
+            searchResult:[],
+        })
+>>>>>>> feature/redis-connect
     }
     @action
     handleSearchCancel = (e) =>{
@@ -104,13 +119,27 @@ class AdminChat extends Component{
         }
     }
     render() {
+<<<<<<< HEAD
         const { chatMessage } =this.props;
         console.log(this.props.roomNameList)
         let chatMessageList = chatMessage.map((item, i) =>{ 
             console.log(item)
             console.log(item.message)
+=======
+         const { chatMessageMap,
+              selectRoomId,
+              getChatRoomList,
+              deleteRedisKey,
+              roomNameList }  =this.props;
+        
+        console.log( "[SEO] selectRoomId" ,selectRoomId, chatMessageMap.get(selectRoomId));
+        let chatMessageList = []
+        if(!_.isNil(chatMessageMap.get(selectRoomId))){
+            chatMessageList = chatMessageMap.get(selectRoomId)
+        }
+        let chatMessage = chatMessageList.map((item, i) => { 
+>>>>>>> feature/redis-connect
             let messageClassName ;
-
             if(item.system){
                 messageClassName = 'systemMessage'
             }else{
@@ -121,17 +150,32 @@ class AdminChat extends Component{
                 }
             }
             return (
+<<<<<<< HEAD
                 !item.isMe ?
                 <ChatItem key = {i} nickName = {item.userName} message = {item.message}/> : 
                 <div className = {messageClassName} key = {i} >
                     {item.userName+ ": " + item.message }
                 </div>
              
+=======
+                !item.isMe ? 
+                <ChatItem userName =  {item.userName}
+                          message ={item.message}
+                          key = {i}
+                />  :
+                <div className = {messageClassName}>
+                    {item.userName+ ": " + item.message }
+                </div> 
+>>>>>>> feature/redis-connect
             )
         })
+
+
+
         return (
             <div className ='chatRooWrapper' height = "100%">
-
+                <button onClick = {getChatRoomList}>getChatRoomList</button>
+                <button onClick = {deleteRedisKey}>deleteRedisKey</button>
                 <div className = {'roomList'} >
                     <form className = {'searchBox'} onSubmit={this.handleSearch}>
                         <SearchOutlinedIcon/>
@@ -147,12 +191,12 @@ class AdminChat extends Component{
                         {this.searchResult}
                     </ListGroup>
                     <ListGroup>
-                        {this.createListItem(this.props.roomNameList)}
+                        {this.createListItem(roomNameList)}
                     </ListGroup>
                 </div>
-                <div className = {'chatRoom'} >
+                <div className = 'chatRoom'>
                     <div className= 'message'>
-                        {chatMessageList}
+                        {chatMessage}
                     </div>
                     <div className = "inputBox">
                         <form onSubmit={this.chatMessageSendServer} style = {{width:'100%'}}>
@@ -182,10 +226,14 @@ class AdminChat extends Component{
 }
 
 export default inject(({ chat }) => ({
-    getRoomList : chat.getRoomList,
+    chatMessageMap : chat.chatMessageMap,
+    selectRoomId : chat.selectRoomId,
+    roomNameList : chat.roomNameList,
+    getChatRoomList : chat.getChatRoomList,
     roomNameList : chat.roomNameList,
     setSocketConnection : chat.setSocketConnection,
     sendChatMessage : chat.sendChatMessage,
     chatMessage : chat.chatMessage,
-    adminJoinRoom : chat.adminJoinRoom
+    joinChatRoom : chat.joinChatRoom,
+    deleteRedisKey : chat.deleteRedisKey
   }))(observer( AdminChat));

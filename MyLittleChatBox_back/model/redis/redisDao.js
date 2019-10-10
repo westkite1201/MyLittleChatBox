@@ -1,5 +1,6 @@
 const redishelpers = require('./redis');
 const util = require('util');
+const _  = require('lodash')
 
 const key_user_status = 'skb-user-status';
 
@@ -14,6 +15,34 @@ const key_component_info = 'ComponentInfo';
 const KEY_ROOM =  'CHAT_ROOM'
 const KEY_MESSAGE = 'CHAT_MESSAGE'
 
+const returnStatusCode = async(successYn, data ) => {
+  if(_.isNil(data)){
+    data = ''
+  }
+
+  let res = await successYn;
+ // console.log("res" , res)
+  data = res;
+  let statusInfo = {
+    message : '',
+    statusCode : '',
+    data : data
+  }
+  if( successYn ){
+    statusInfo.message = "suceess"
+    statusInfo.statusCode = 200
+  }else{
+     statusInfo.message = "error"
+     statusInfo.statusCode = 400
+  }
+  //console.log("status", statusInfo)
+  return statusInfo;
+}
+/* 레디스 키 제거 */ 
+const deleteRedisKey = () => {
+  redishelpers.redis.del(KEY_ROOM)
+}
+
 //message add 
 const addMessage = (messageInfo) => {
   console.log("[SEO][redisDao]   messageInfo ", messageInfo)
@@ -23,22 +52,64 @@ const addMessage = (messageInfo) => {
   return redishelpers.redis.rpush(key, message);
 }
 
-const getChatRoomList  = (data) => {
-  const key = util.format("%s:%s", KEY_ROOM, data.socketId);
-  return redishelpers.redis.rpush(key, message);
+//message add 
+const getChatMessage = (messageInfo) => {
+  console.log("[SEO][redisDao]   messageInfo ", messageInfo)
+  const key = util.format("%s:%s:%s", KEY_MESSAGE, messageInfo.roomId, messageInfo.socketId);
+  //let message = messageInfo.message;
+  console.log("[SEO][redisDao] key , message", key, message)
+  return redishelpers.redis.lrange(key, 10);
+}
+/* chatRoom 생성  */
+/* set 중복없는 value 값  */
+/* key = roomId + socketId */
+/* value socketId */
+const createChatRoom = (data) => {
+  const key = util.format("%s", KEY_ROOM);
+  //console.log("[SEO][createChatRoom] ",data.messageInfo.roomId)
+  return  returnStatusCode( redishelpers.redis.sadd(key, data.messageInfo.roomId))// roomList를 위해
 }
 
-const joinChatRoom = (data) => {
-  //let key = KEY_ROOM + data;
-  // let key = data.socketId;
-  // let message = data.message;
-  // return redishelpers.redis.rpush(key, message);
+
+const getChatRoomList  = async() => {
+  const key = util.format("%s", KEY_ROOM);
+  //console.log("getChatRoomList", key)
+  let resdata =  await returnStatusCode(redishelpers.redis.smembers(key))
+  //console.log("getChatRoomList2 ", resdata)
+  return resdata;
 }
 
-const leaveChatRoom  = () => {
-  let key = data.socketId;
-  return redishelpers.redis.rpush(key, message);
+/* 방에 들어가기  */
+const joinChatRoom = (messageInfo) => {
+  const key = util.format("%s:%s", KEY_ROOM, messageInfo.roomId);
+  redishelpers.redis.sadd(key, messageInfo.socketId);
 }
+/* 방에서 나가기  */
+/*  socketId에 해당되는 값 제거  */
+const leaveChatRoom  = (messageInfo) => {
+  const key = util.format("%s:%s", KEY_ROOM, messageInfo.roomId);
+  let socketId = data.socketId;
+  redishelpers.redis.srem(key, socketId);
+  
+  let memberCount = getChatRoomMember(messageInfo)
+  if( memberCount === 0 ){
+    distroyRoom();
+  }
+}
+
+/*해당 room 제거  */
+const distroyRoom = (messageInfo) => {
+  redishelpers.redis.srem(KEY_ROOM, messageInfo.roomId);
+}
+
+
+/* 채팅방 멤버수 구하기  */
+const getChatRoomMember  = (messageInfo) => {
+  const key = util.format("%s:%s", KEY_ROOM, messageInfo.roomId);
+  return redishelpers.redis.smembers(key);
+}
+
+
 
 
 
@@ -262,10 +333,15 @@ module.exports = {
 
   //key 
   //CHAT 함수 
+  deleteRedisKey : deleteRedisKey,
+  getChatMessage : getChatMessage,
   addMessage: addMessage,
+  createChatRoom : createChatRoom,
   getChatRoomList : getChatRoomList,
+  getChatRoomMember :getChatRoomMember,
   joinChatRoom : joinChatRoom,
   leaveChatRoom  : leaveChatRoom,
+
 
   // Expire Test
   //expireTest: expireTest,
