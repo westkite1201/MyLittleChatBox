@@ -5,13 +5,12 @@ import TextField from '@material-ui/core/TextField';
 import ChatItem from  '../../ChatView/ChatItem'
 
 import SearchOutlinedIcon from '@material-ui/icons/SearchOutlined';
-
+import _ from 'lodash'
 import Button from '@material-ui/core/Button';
 import Icon from '@material-ui/core/Icon';
 import {isEmpty} from 'lodash'
 import ClearSharpIcon from '@material-ui/icons/ClearSharp';
 import './AdminChat.scss';
-import { symbols } from 'ansi-colors';
 
 class AdminChat extends Component{
     state = {
@@ -28,7 +27,7 @@ class AdminChat extends Component{
         setSocketConnection('admin')
         getChatRoomList();
         // setInterval(()=>{
-        //     getRoomList();
+        //     getChatRoomList();
         // },1000)
     }
        //인풋 박스 핸들링 
@@ -101,19 +100,19 @@ class AdminChat extends Component{
         }
     }
     render() {
-        const { chatMessage, 
-                roomNameList,
-                getChatRoomList, 
-                deleteRedisKey } = this.props;
-        console.log(this.state.roomList)
-
-
-
+         const { chatMessageMap,
+              selectRoomId,
+              getChatRoomList,
+              deleteRedisKey,
+              roomNameList }  =this.props;
         
-        let chatMessageList = chatMessage.map((item, i) =>{ 
-            console.log(item)
+        console.log( "[SEO] selectRoomId" ,selectRoomId, chatMessageMap.get(selectRoomId));
+        let chatMessageList = []
+        if(!_.isNil(chatMessageMap.get(selectRoomId))){
+            chatMessageList = chatMessageMap.get(selectRoomId)
+        }
+        let chatMessage = chatMessageList.map((item, i) => { 
             let messageClassName ;
-
             if(item.system){
                 messageClassName = 'systemMessage'
             }else{
@@ -124,11 +123,19 @@ class AdminChat extends Component{
                 }
             }
             return (
-                !item.isMe ?
-                <ChatItem/> : 
-                <div className = {messageClassName} >{item.userName+ ": " + item.message }</div>
+                !item.isMe ? 
+                <ChatItem userName =  {item.userName}
+                          message ={item.message}
+                          key = {i}
+                />  :
+                <div className = {messageClassName}>
+                    {item.userName+ ": " + item.message }
+                </div> 
             )
         })
+
+
+
         return (
             <div className ='chatRooWrapper' height = "100%">
                 <button onClick = {getChatRoomList}>getChatRoomList</button>
@@ -151,9 +158,9 @@ class AdminChat extends Component{
                         {this.createListItem(roomNameList)}
                     </ListGroup>
                 </div>
-                <div className = {'chatRoom'} >
+                <div className = 'chatRoom'>
                     <div className= 'message'>
-                        {chatMessageList}
+                        {chatMessage}
                     </div>
                     <div className = "inputBox">
                         <form onSubmit={this.chatMessageSendServer} style = {{width:'100%'}}>
@@ -183,6 +190,7 @@ class AdminChat extends Component{
 }
 
 export default inject(({ chat }) => ({
+    chatMessageMap : chat.chatMessageMap,
     selectRoomId : chat.selectRoomId,
     roomNameList : chat.roomNameList,
     getChatRoomList : chat.getChatRoomList,

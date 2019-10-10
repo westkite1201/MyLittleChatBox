@@ -11,7 +11,6 @@ import Icon from '@material-ui/core/Icon';
 class ChatView extends Component {
 
     state = {
-        nickName : 'user',
         chatMsg : '',
         temp : [],
         //chatSocket : io('http://localhost:3031/chat')
@@ -46,11 +45,6 @@ class ChatView extends Component {
         console.log(e.target)
         this.setState({
             chatMsg : e.target.value
-        })
-    }
-    handleNickName = (e) =>{
-        this.setState({
-            nickName : e.target.value
         })
     }
 
@@ -97,7 +91,6 @@ class ChatView extends Component {
                     {chatMessage}
                 </div>
                 <form onSubmit={this.chatMessageSendServer}>
-                    <input onChange ={this.handleNickName} placeholder="nickname"/>
                     <TextField
                                 id="inputMessage"
                                 //label="메세지를 입력해주세요"
