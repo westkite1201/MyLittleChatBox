@@ -50,7 +50,7 @@ export default class ChatStore {
     }
     /* 기존 소켓 id가 있다면  */
     /* setting Socket  */
-    if(cookies.get('socketId')){ //있으면
+    if(cookies.get('socketId') && cookies.get('userId') && cookies.get('userName')) { //있으면
       let settingSocketId = cookies.get('socketId');
       cookies.set('socketId',settingSocketId);
       cookies.set('userId',userInfo.userId);
