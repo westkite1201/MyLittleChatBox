@@ -1,6 +1,8 @@
 import { observable, action, computed } from "mobx";
 import io from "socket.io-client";
 import { isEmpty, isNil } from "lodash";
+import { Cookies } from 'react-cookie'
+const cookies = new Cookies();
 //let chatMessageMap = new Map();
 export default class ChatStore {
   @observable socket = "";
@@ -41,21 +43,25 @@ export default class ChatStore {
   initUserInfo = () =>{
     let { socketId } = this; 
     console.log("[SEO][InitUserInfo] socketId = ", socketId)
-    let userInfo ={
+    let userInfo = {
         socketId : socketId,
         userId : socketId + "_0",
         userName : this.nicknameMaker(),
     }
     /* 기존 소켓 id가 있다면  */
     /* setting Socket  */
-    if(localStorage.getItem('socketId')){
-      let settingSocketId= localStorage.getItem('socketId');
-      localStorage.setItem('socketid',settingSocketId);
+    if(cookies.get('socketId')){ //있으면
+      let settingSocketId = cookies.get('socketId');
+      cookies.set('socketId',settingSocketId);
+      cookies.set('userId',userInfo.userId);
+      cookies.set('userName',userInfo.userName);
       socketId = settingSocketId;
     }else{ //없다면 setting
-      localStorage.setItem('socketid', socketId);
+      cookies.set('socketId', socketId);
+      cookies.set('userId',userInfo.userId);
+      cookies.set('userName',userInfo.userName);
     }
-
+    console.log("[SEO][ COOKIE ] ", cookies.get('socketId')) 
     this.userInfo = userInfo;
   }
   //client 방 만들기 
