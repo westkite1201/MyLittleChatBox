@@ -56,7 +56,8 @@ class ChatView extends Component {
     }
     render() {
         const { chatMessageMap,
-              selectRoomId }  =this.props;
+              selectRoomId,
+              getChatMessage }  =this.props;
         
         console.log( "[SEO] selectRoomId" ,selectRoomId, chatMessageMap.get(selectRoomId));
         let chatMessageList = []
@@ -111,12 +112,15 @@ class ChatView extends Component {
                         </Button>
                     </label>
                 </form>
-                
+                <button onClick = {getChatMessage} >
+                    getChatMessage
+                </button>
             </div>
         )
     }
 }
 export default inject(({ chat }) => ({
+    getChatMessage : chat.getChatMessage,
     createChatRoom : chat.createChatRoom,
     initUserInfo : chat.initUserInfo,
     getRoomList : chat.getRoomList,

@@ -52,13 +52,16 @@ const addMessage = (messageInfo) => {
   return redishelpers.redis.rpush(key, message);
 }
 
-//message add 
+//message get
 const getChatMessage = (messageInfo) => {
-  console.log("[SEO][redisDao]   messageInfo ", messageInfo)
-  const key = util.format("%s:%s:%s", KEY_MESSAGE, messageInfo.roomId, messageInfo.socketId);
+  console.log("[SEO][redisDao]   getChatMessage ", messageInfo)
+  let testRoomId = "못되먹은 구렁이_/chat#Nkx_awb3WXaVhedZAAAE"
+  let testSocketId = "/chat#Nkx_awb3WXaVhedZAAAE"
+  //const key = util.format("%s:%s:%s", KEY_MESSAGE, messageInfo.roomId, messageInfo.socketId);
+  const key = util.format("%s:%s:%s", KEY_MESSAGE, testRoomId, testSocketId);
   //let message = messageInfo.message;
-  console.log("[SEO][redisDao] key , message", key, message)
-  return redishelpers.redis.lrange(key, 10);
+  //console.log("[SEO][redisDao] key , message", key, message)
+  return redishelpers.redis.lrange(key, 0, -1);
 }
 /* chatRoom 생성  */
 /* set 중복없는 value 값  */

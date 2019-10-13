@@ -67,17 +67,19 @@ const connection = (io) =>{
         })
 
         //방 메세지 가져오기 
-        socket.on('getChatMessage',( data ) => {
+        socket.on('getChatMessage',async(data) => {
             let messageInfo = {  
-                message : data.message,  //채팅 메세지 
+               //message : data.message,  //채팅 메세지 
                 roomId : data.roomId,   // 룸_id 
                 socketId :  data.socketId, // 소켓 id 로 구분 함  
                 userId : data.userName,// 있으면 id, 없으면 null
                 userName : data.userName, //
             }
-            console.log("[SEO] messageInfo", messageInfo)
-            //userRedis.addMessage(messageInfo)
-            //socket.to(messageInfo.roomId).emit('getChatMessage', { messageInfo : messageInfo })
+      
+            let messageList = await userRedis.getChatMessage(messageInfo)
+            console.log("[SEO] getChatMessage messageList", messageList)
+            
+            socket.to(messageInfo.roomId).emit('getChatMessage', { messageList : messageList })
         })
 
 

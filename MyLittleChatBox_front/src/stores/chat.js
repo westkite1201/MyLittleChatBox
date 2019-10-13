@@ -1,7 +1,6 @@
 import { observable, action, computed } from "mobx";
 import io from "socket.io-client";
 import { isEmpty, isNil } from "lodash";
-import { thisTypeAnnotation } from "@babel/types";
 //let chatMessageMap = new Map();
 export default class ChatStore {
   @observable socket = "";
@@ -137,6 +136,7 @@ export default class ChatStore {
           초기세팅시 이 함수를 통해서 데이터를 로컬에 세팅 함 
        */
        this.chatSocket.on("getChatMessage", data => {
+          console.log("[SEO] getChatMessage" , data)
        });
 
       /* message chat  */
@@ -231,4 +231,22 @@ export default class ChatStore {
     // 서버로 자신의 정보를 전송한다.
     this.chatSocket.emit("sendChatMessage", chatMessage);
   };
+
+
+  //chat message 가져오기 
+  @action
+  getChatMessage = () => {
+    let { userInfo,
+          selectRoomId } = this;
+    let chatMessage = {
+      message : "",  //채팅 메세지 
+      roomId : isNil(selectRoomId) ? userInfo.userName + "_" + this.socketId : selectRoomId,   // 룸_id 
+      socketId : this.chatSocket.id, // 소켓 id 로 구분 함  
+      userId : userInfo.userName,// 있으면 id, 없으면 null
+      userName :userInfo.userName, //
+      //isMe : true // sendMessage 는 무조건 나
+    }
+    console.log("[SEO] getChatMessage client -> server ", chatMessage)
+    this.chatSocket.emit("getChatMessage", chatMessage);
+  }
 }
