@@ -118,6 +118,14 @@ export default class ChatStore {
     
     //this.getChatMessage()
   };
+  /* 테스트용  */
+  @action
+  getNowjoinedChatRoom = e => {
+    console.log("[SEO] getNowjoinedChatRoom ")
+    this.chatSocket.emit('getNowjoinedChatRoom', "");
+    
+    //this.getChatMessage()
+  };
 
   @action
   deleteRedisKey = () => {
@@ -149,8 +157,14 @@ export default class ChatStore {
        /* redis connect 
           초기세팅시 이 함수를 통해서 데이터를 로컬에 세팅 함 
           들어갔을때 이 함수를 통해서 message를 가져와야함 
+
+          - 문제  발견 현재 redis 는 그냥 데이터만 들어감 스트링 값만
+          근데 이 스트링 값은 밑에 chatMessage 처럼 데이터가 없음
+        그래서 누가 보낸건지 모름 
+        데이터 저장할때 roomId, socketId,message 를 구분자 줘서 어케 처리해야할듯?
        */
        this.chatSocket.on("getChatMessage", data => {
+        
           console.log("[SEO] getChatMessage" , data)
           const {chatMessageMap} = this;
           // let mySocketId = localStorage.getItem('socketId')
@@ -286,8 +300,9 @@ export default class ChatStore {
           selectRoomId } = this;
     let chatMessage = {
       message : "",  //채팅 메세지 
-      roomId : isNil(selectRoomId) ? userInfo.userName + "_" + this.socketId : selectRoomId,   // 룸_id 
-      socketId : this.chatSocket.id, // 소켓 id 로 구분 함  
+     //roomId : isNil(selectRoomId) ? userInfo.userName + "_" + this.socketId : selectRoomId,   // 룸_id 
+     roomId :  selectRoomId,
+     socketId : this.chatSocket.id, // 소켓 id 로 구분 함  
       userId : userInfo.userName,// 있으면 id, 없으면 null
       userName :userInfo.userName, //
       //isMe : true // sendMessage 는 무조건 나

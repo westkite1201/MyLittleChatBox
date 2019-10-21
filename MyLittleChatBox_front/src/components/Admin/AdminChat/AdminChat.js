@@ -101,7 +101,8 @@ class AdminChat extends Component{
               selectRoomId,
               getChatRoomList,
               deleteRedisKey,
-              roomNameList }  =this.props;
+              roomNameList,
+              getChatMessage }  =this.props;
         
         console.log( "[SEO] selectRoomId" ,selectRoomId, chatMessageMap.get(selectRoomId));
         let chatMessageList = []
@@ -137,6 +138,7 @@ class AdminChat extends Component{
             <div className ='chatRooWrapper' height = "100%">
                 <button onClick = {getChatRoomList}>getChatRoomList</button>
                 <button onClick = {deleteRedisKey}>deleteRedisKey</button>
+                <button onClick = {getChatMessage}>getChatMessage</button>
                 <div className = {'roomList'} >
                     <form className = {'searchBox'} onSubmit={this.handleSearch}>
                         <SearchOutlinedIcon/>
@@ -196,5 +198,6 @@ export default inject(({ chat }) => ({
     sendChatMessage : chat.sendChatMessage,
     chatMessage : chat.chatMessage,
     joinChatRoom : chat.joinChatRoom,
-    deleteRedisKey : chat.deleteRedisKey
+    deleteRedisKey : chat.deleteRedisKey,
+    getChatMessage : chat.getChatMessage,
   }))(observer( AdminChat));

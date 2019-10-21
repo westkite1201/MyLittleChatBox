@@ -20,15 +20,17 @@ const connection = (io) =>{
             socket.join(roomId)
             console.log(socket.rooms)
             socket.emit('getChatRoomList', roomList)
-            socket.to(roomId).emit('getChatRoomList',  "room에보냄 ")
+            //socket.to(roomId).emit('getChatRoomList',  roomList)
             //socket.emit('getChatRoomList', roomList)
         })
         //방 들어가기 
-        socket.on('joinChatRoom', function(data) {
-            console.log("[SEO][joinChatRoom] ", data)
-            socket.join(data.messageInfo.roomId) //socketJoin
+        socket.on('joinChatRoom', (data) => {
+            console.log("[SEO][joinChatRoom] ", data.messageInfo.roomId)
+            let roomId = data.messageInfo.roomId
             userRedis.joinChatRoom(data);
-            socket.to(data.messageInfo.roomId).emit('joinChatRoom',  {message: "[joinChatRoom] roomd id is "+data.messageInfo.roomId })
+            socket.join(roomId) //socketJoin
+            socket.emit('joinChatRoom', {message : socket.rooms})
+            socket.to(roomId).emit('joinChatRoom',  {message: "[joinChatRoom] roomd id is "+data.messageInfo.roomId })
         })
         //방 나가기
         socket.on('leaveChatRoom', function(data) {
@@ -78,9 +80,27 @@ const connection = (io) =>{
             }
       
             let messageList = await userRedis.getChatMessage(messageInfo)
+
+            messageList = messageList.map((item)=>{
+                messageInfoAssemble=  item.split(":")
+                let messageInfo ={
+                    message : messageInfoAssemble[0],  //채팅 메세지 
+                    roomId : messageInfoAssemble[1],   // 룸_id 
+                    socketId :  messageInfoAssemble[2], // 소켓 id 로 구분 함  
+                    userId : messageInfoAssemble[3],// 있으면 id, 없으면 null
+                    userName : messageInfoAssemble[4], //
+                }
+                return messageInfo;
+            })
+
+
             console.log("[SEO] getChatMessage messageList", messageList)
             
             socket.to(messageInfo.roomId).emit('getChatMessage', { messageList : messageList })
+        })
+
+        socket.on('getNowjoinedChatRoom',() => {
+
         })
 
 

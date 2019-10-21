@@ -51,8 +51,14 @@ const addMessage = (messageInfo) => {
   //const key = util.format("%s:%s:%s", KEY_MESSAGE, messageInfo.roomId, messageInfo.socketId);
   const key = util.format("%s:%s", KEY_MESSAGE, messageInfo.roomId);
   let message = messageInfo.message;
-  console.log("[SEO][redisDao] key , message", key, message)
-  return redishelpers.redis.rpush(key, message);
+  let roomId = messageInfo.roomId;
+  let socketId = messageInfo.socketId;
+  let userId = messageInfo.userId;
+  let userName = messageInfo.userName;
+  const value = util.format("%s:%s:%s:%s:%s:%s", KEY_MESSAGE, message, roomId, socketId, userId, userName);
+  //const key = util.format("%s:%s", KEY_MESSAGE, messageInfo.roomId);
+  console.log("[SEO][redisDao] key , message", key, value)
+  return redishelpers.redis.rpush(key, value);
 }
 
 //message get
