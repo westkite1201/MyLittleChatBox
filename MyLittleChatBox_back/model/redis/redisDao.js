@@ -44,21 +44,27 @@ const deleteRedisKey = () => {
 }
 
 //message add 
+//message add 에 소켓 아이디가 필요한가.?
+//걍 roomId만 있으면 되는거아녀?
 const addMessage = (messageInfo) => {
   console.log("[SEO][redisDao]   messageInfo ", messageInfo)
-  const key = util.format("%s:%s:%s", KEY_MESSAGE, messageInfo.roomId, messageInfo.socketId);
+  //const key = util.format("%s:%s:%s", KEY_MESSAGE, messageInfo.roomId, messageInfo.socketId);
+  const key = util.format("%s:%s", KEY_MESSAGE, messageInfo.roomId);
   let message = messageInfo.message;
   console.log("[SEO][redisDao] key , message", key, message)
   return redishelpers.redis.rpush(key, message);
 }
 
 //message get
+//message add 에 소켓 아이디가 필요한가.?
+//그러면 조회도 룸아이디로만 
 const getChatMessage = (messageInfo) => {
   console.log("[SEO][redisDao]   getChatMessage ", messageInfo)
-  let testRoomId = "못되먹은 구렁이_/chat#Nkx_awb3WXaVhedZAAAE"
-  let testSocketId = "/chat#Nkx_awb3WXaVhedZAAAE"
+  let testRoomId = "심술궂은 핑핑이_/chat#kcvuhUrYDXgmFWmbAAAD"
+  //let testSocketId = "/chat#Nkx_awb3WXaVhedZAAAE"
   //const key = util.format("%s:%s:%s", KEY_MESSAGE, messageInfo.roomId, messageInfo.socketId);
-  const key = util.format("%s:%s:%s", KEY_MESSAGE, testRoomId, testSocketId);
+  //const key = util.format("%s:%s:%s", KEY_MESSAGE, testRoomId, testSocketId);
+  const key = util.format("%s:%s", KEY_MESSAGE, messageInfo.roomId);
   //let message = messageInfo.message;
   //console.log("[SEO][redisDao] key , message", key, message)
   return redishelpers.redis.lrange(key, 0, -1);

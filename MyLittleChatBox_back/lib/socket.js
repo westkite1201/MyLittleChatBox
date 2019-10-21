@@ -28,6 +28,7 @@ const connection = (io) =>{
             console.log("[SEO][joinChatRoom] ", data)
             socket.join(data.messageInfo.roomId) //socketJoin
             userRedis.joinChatRoom(data);
+            socket.to(data.messageInfo.roomId).emit('joinChatRoom',  {message: "[joinChatRoom] roomd id is "+data.messageInfo.roomId })
         })
         //방 나가기
         socket.on('leaveChatRoom', function(data) {

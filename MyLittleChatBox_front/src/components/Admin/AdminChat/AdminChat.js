@@ -54,7 +54,7 @@ class AdminChat extends Component{
         document.getElementById('input-with-icon-textfield').value = ''
 
     }
-    @action
+
     handleSearchKeyword = (e) =>{
         const { roomNameList } = this.props;
         if(isEmpty(e.target.value)){
@@ -88,7 +88,7 @@ class AdminChat extends Component{
             searchResult:[],
         })
     }
-    @action
+
     handleSearchCancel = (e) =>{
         console.log(e.key)
         if(e.key === 'Escape'){

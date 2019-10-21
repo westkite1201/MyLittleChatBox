@@ -50,16 +50,20 @@ export default class ChatStore {
     }
     /* 기존 소켓 id가 있다면  */
     /* setting Socket  */
+    // Expires Example
+    let today = new Date();
+    let tomorrow = new Date();
+    tomorrow.setDate(today.getDate()+1);
     if(cookies.get('socketId') && cookies.get('userId') && cookies.get('userName')) { //있으면
       let settingSocketId = cookies.get('socketId');
-      cookies.set('socketId',settingSocketId);
-      cookies.set('userId',userInfo.userId);
-      cookies.set('userName',userInfo.userName);
+      cookies.set('socketId',settingSocketId, { expires: tomorrow });
+      cookies.set('userId',userInfo.userId, { expires: tomorrow });
+      cookies.set('userName',userInfo.userName, { expires: tomorrow });
       socketId = settingSocketId;
     }else{ //없다면 setting
-      cookies.set('socketId', socketId);
-      cookies.set('userId',userInfo.userId);
-      cookies.set('userName',userInfo.userName);
+      cookies.set('socketId', socketId, { expires: tomorrow });
+      cookies.set('userId',userInfo.userId, { expires: tomorrow });
+      cookies.set('userName',userInfo.userName, { expires: tomorrow });
     }
     console.log("[SEO][ COOKIE ] ", cookies.get('socketId')) 
     this.userInfo = userInfo;
@@ -111,6 +115,8 @@ export default class ChatStore {
     console.log("[SEO] adminJoinRoom " , e.target.name)
     this.selectRoomId = e.target.name;
     this.chatSocket.emit('joinChatRoom', { messageInfo: { roomId : e.target.name}})
+    
+    //this.getChatMessage()
   };
 
   @action
@@ -137,12 +143,46 @@ export default class ChatStore {
      
       this.chatSocket = chatSocket;
       console.log("[SEO] this.chatSocket " , this.chatSocket, chatSocket.id);
-  
+      this.chatSocket.on("joinChatRoom", data =>{
+         console.log("[SEO] joinChatRoom ", data.message)
+       })
        /* redis connect 
           초기세팅시 이 함수를 통해서 데이터를 로컬에 세팅 함 
+          들어갔을때 이 함수를 통해서 message를 가져와야함 
        */
        this.chatSocket.on("getChatMessage", data => {
           console.log("[SEO] getChatMessage" , data)
+          const {chatMessageMap} = this;
+          // let mySocketId = localStorage.getItem('socketId')
+           const { socketId } = this.userInfo;
+           let isMe = false;
+           if( socketId === data.socketId){ //isMe
+               isMe = true;
+           }
+   
+           let chatMessage = {
+             message : data.message,  //채팅 메세지 
+             roomId : data.roomId,   // 룸_id 
+             socketId :  data.socketId, // 소켓 id 로 구분 함  
+             userId : data.userName,// 있으면 id, 없으면 null
+             userName : data.userName, //
+             isMe : isMe
+           }
+           
+           //현재 방에 메세지가 있다면 
+           if (chatMessageMap.has(data.roomId)) {
+             console.log('[SEO] chatMessageMap has')
+             let tempChatMessageList = [];
+             tempChatMessageList = chatMessageMap.get(data.roomId);
+             tempChatMessageList.push(chatMessage)
+             chatMessageMap.set(data.roomId, tempChatMessageList);
+           } 
+           else { //처음 세팅 
+             console.log('[SEO] chatMessageMap has not')
+             chatMessageMap.set(data.roomId, [chatMessage]);
+           }
+           this.selectRoomId = data.roomId
+
        });
 
       /* message chat  */
