@@ -66,7 +66,7 @@ const addMessage = (messageInfo) => {
 //그러면 조회도 룸아이디로만 
 const getChatMessage = (messageInfo) => {
   console.log("[SEO][redisDao]   getChatMessage ", messageInfo)
-  let testRoomId = "심술궂은 핑핑이_/chat#kcvuhUrYDXgmFWmbAAAD"
+  //let testRoomId = "심술궂은 핑핑이_/chat#kcvuhUrYDXgmFWmbAAAD"
   //let testSocketId = "/chat#Nkx_awb3WXaVhedZAAAE"
   //const key = util.format("%s:%s:%s", KEY_MESSAGE, messageInfo.roomId, messageInfo.socketId);
   //const key = util.format("%s:%s:%s", KEY_MESSAGE, testRoomId, testSocketId);

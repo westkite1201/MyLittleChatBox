@@ -116,7 +116,7 @@ export default class ChatStore {
     this.selectRoomId = e.target.name;
     this.chatSocket.emit('joinChatRoom', { messageInfo: { roomId : e.target.name}})
     
-    //this.getChatMessage()
+    this.getChatMessage()
   };
   /* 테스트용  */
   @action
@@ -159,9 +159,9 @@ export default class ChatStore {
           들어갔을때 이 함수를 통해서 message를 가져와야함 
 
           - 문제  발견 현재 redis 는 그냥 데이터만 들어감 스트링 값만
-          근데 이 스트링 값은 밑에 chatMessage 처럼 데이터가 없음
-        그래서 누가 보낸건지 모름 
-        데이터 저장할때 roomId, socketId,message 를 구분자 줘서 어케 처리해야할듯?
+            근데 이 스트링 값은 밑에 chatMessage 처럼 데이터가 없음
+            그래서 누가 보낸건지 모름 
+            데이터 저장할때 roomId, socketId,message 를 구분자 줘서 어케 처리해야할듯?
        */
        this.chatSocket.on("getChatMessage", data => {
         
@@ -169,31 +169,37 @@ export default class ChatStore {
           const {chatMessageMap} = this;
           // let mySocketId = localStorage.getItem('socketId')
            const { socketId } = this.userInfo;
-           let isMe = false;
-           if( socketId === data.socketId){ //isMe
-               isMe = true;
-           }
-   
-           let chatMessage = {
-             message : data.message,  //채팅 메세지 
-             roomId : data.roomId,   // 룸_id 
-             socketId :  data.socketId, // 소켓 id 로 구분 함  
-             userId : data.userName,// 있으면 id, 없으면 null
-             userName : data.userName, //
-             isMe : isMe
-           }
+  
+           let { messageList } = data;
            
+
+           messageList = messageList.map((item)=> {
+            let isMe = false;
+            if( socketId === item.socketId){ //isMe
+                isMe = true;
+            }
+            let chatMessage = {
+                message : item.message,  //채팅 메세지 
+                roomId : item.roomId,   // 룸_id 
+                socketId :  item.socketId, // 소켓 id 로 구분 함  
+                userId : item.userName,// 있으면 id, 없으면 null
+                userName : item.userName, //
+                isMe : isMe
+            }
+            return chatMessage;
+           })
+     
            //현재 방에 메세지가 있다면 
            if (chatMessageMap.has(data.roomId)) {
              console.log('[SEO] chatMessageMap has')
-             let tempChatMessageList = [];
-             tempChatMessageList = chatMessageMap.get(data.roomId);
-             tempChatMessageList.push(chatMessage)
-             chatMessageMap.set(data.roomId, tempChatMessageList);
+             //let tempChatMessageList = [];
+             //tempChatMessageList = chatMessageMap.get(data.roomId);
+             //tempChatMessageList.push(chatMessage)
+             chatMessageMap.set(data.roomId, messageList);
            } 
            else { //처음 세팅 
              console.log('[SEO] chatMessageMap has not')
-             chatMessageMap.set(data.roomId, [chatMessage]);
+             chatMessageMap.set(data.roomId, messageList);
            }
            this.selectRoomId = data.roomId
 

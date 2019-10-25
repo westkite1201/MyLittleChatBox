@@ -72,7 +72,7 @@ const connection = (io) =>{
         //방 메세지 가져오기 
         socket.on('getChatMessage',async(data) => {
             let messageInfo = {  
-               //message : data.message,  //채팅 메세지 
+               message : "",  //채팅 메세지 
                 roomId : data.roomId,   // 룸_id 
                 socketId :  data.socketId, // 소켓 id 로 구분 함  
                 userId : data.userName,// 있으면 id, 없으면 null
@@ -84,19 +84,20 @@ const connection = (io) =>{
             messageList = messageList.map((item)=>{
                 messageInfoAssemble=  item.split(":")
                 let messageInfo ={
-                    message : messageInfoAssemble[0],  //채팅 메세지 
-                    roomId : messageInfoAssemble[1],   // 룸_id 
-                    socketId :  messageInfoAssemble[2], // 소켓 id 로 구분 함  
-                    userId : messageInfoAssemble[3],// 있으면 id, 없으면 null
-                    userName : messageInfoAssemble[4], //
+                    message : messageInfoAssemble[1],  //채팅 메세지 
+                    roomId : messageInfoAssemble[2],   // 룸_id 
+                    socketId :  messageInfoAssemble[3], // 소켓 id 로 구분 함  
+                    userId : messageInfoAssemble[4],// 있으면 id, 없으면 null
+                    userName : messageInfoAssemble[5], //
                 }
                 return messageInfo;
             })
 
 
             console.log("[SEO] getChatMessage messageList", messageList)
-            
-            socket.to(messageInfo.roomId).emit('getChatMessage', { messageList : messageList })
+            socket.join(messageInfo.roomId);
+            //socket.to(messageInfo.roomId).emit('getChatMessage', { messageList : messageList })
+            namespaceChat.to(messageInfo.roomId).emit('getChatMessage', { messageList : messageList })
         })
 
         socket.on('getNowjoinedChatRoom',() => {

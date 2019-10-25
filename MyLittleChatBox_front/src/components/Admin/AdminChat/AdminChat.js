@@ -102,7 +102,7 @@ class AdminChat extends Component{
               getChatRoomList,
               deleteRedisKey,
               roomNameList,
-              getChatMessage }  =this.props;
+            getChatMessage }  =this.props;
         
         console.log( "[SEO] selectRoomId" ,selectRoomId, chatMessageMap.get(selectRoomId));
         let chatMessageList = []
