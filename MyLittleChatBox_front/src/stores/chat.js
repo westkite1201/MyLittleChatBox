@@ -32,8 +32,11 @@ export default class ChatStore {
   
   //닉네임 만들기 
   nicknameMaker = () => {
-    let firstNameList = ['못되먹은','착해빠진','심술궂은', '징징대는'] ;
-    let secondNameList = ['상어','오징어','구렁이','핑핑이']
+  //   let firstNameList = ['못되먹은','착해빠진','심술궂은', '징징대는'] ;
+  //   let secondNameList = ['상어','오징어','구렁이','핑핑이']
+
+    let firstNameList = ['A','B','C', 'D'] ;
+    let secondNameList = ['1','2','3','4']
     let first = Math.floor(Math.random() * firstNameList.length - 1 ) + 1;
     let second = Math.floor(Math.random() * firstNameList.length -1 ) + 1;
     return firstNameList[first] + " " + secondNameList[second]
@@ -74,12 +77,12 @@ export default class ChatStore {
             socketId } = this;  
     let roomId =  userInfo.userName + "_" + socketId ;
   
-    if (localStorage.getItem('roomId')) {
-      let settingRoomId = localStorage.getItem('roomId');
-      localStorage.setItem('roomId',settingRoomId);
-    }else { //없다면 setting
-      localStorage.setItem('roomId', roomId);
-    }
+    // if (localStorage.getItem('roomId')) {
+    //   let settingRoomId = localStorage.getItem('roomId');
+    //   localStorage.setItem('roomId',settingRoomId);
+    // }else { //없다면 setting
+    //   localStorage.setItem('roomId', roomId);
+    // }
 
     let messageInfo = 
     {  
@@ -171,37 +174,39 @@ export default class ChatStore {
            const { socketId } = this.userInfo;
   
            let { messageList } = data;
-           
+           console.log("[SEO][getChatMessage] data " , data)  
+          if(isEmpty(messageList)){ //아무것도없으면 할일없음 
+            return;
+          }
+
+          let selectRoomId = messageList[0].roomId
 
            messageList = messageList.map((item)=> {
-            let isMe = false;
-            if( socketId === item.socketId){ //isMe
-                isMe = true;
-            }
-            let chatMessage = {
-                message : item.message,  //채팅 메세지 
-                roomId : item.roomId,   // 룸_id 
-                socketId :  item.socketId, // 소켓 id 로 구분 함  
-                userId : item.userName,// 있으면 id, 없으면 null
-                userName : item.userName, //
-                isMe : isMe
-            }
-            return chatMessage;
+              let isMe = false;
+              if( socketId === item.socketId){ //isMe
+                  isMe = true;
+              }
+              let chatMessage = {
+                  message : item.message,  //채팅 메세지 
+                  roomId : item.roomId,   // 룸_id 
+                  socketId :  item.socketId, // 소켓 id 로 구분 함  
+                  userId : item.userName,// 있으면 id, 없으면 null
+                  userName : item.userName, //
+                  isMe : isMe
+              }
+              return chatMessage;
            })
      
            //현재 방에 메세지가 있다면 
-           if (chatMessageMap.has(data.roomId)) {
+           if (chatMessageMap.has(selectRoomId)) {
              console.log('[SEO] chatMessageMap has')
-             //let tempChatMessageList = [];
-             //tempChatMessageList = chatMessageMap.get(data.roomId);
-             //tempChatMessageList.push(chatMessage)
-             chatMessageMap.set(data.roomId, messageList);
+             chatMessageMap.set(selectRoomId, messageList);
            } 
            else { //처음 세팅 
              console.log('[SEO] chatMessageMap has not')
-             chatMessageMap.set(data.roomId, messageList);
+             chatMessageMap.set(selectRoomId, messageList);
            }
-           this.selectRoomId = data.roomId
+           this.selectRoomId = selectRoomId
 
        });
 
@@ -306,9 +311,9 @@ export default class ChatStore {
           selectRoomId } = this;
     let chatMessage = {
       message : "",  //채팅 메세지 
-     //roomId : isNil(selectRoomId) ? userInfo.userName + "_" + this.socketId : selectRoomId,   // 룸_id 
-     roomId :  selectRoomId,
-     socketId : this.chatSocket.id, // 소켓 id 로 구분 함  
+      //roomId : isNil(selectRoomId) ? userInfo.userName + "_" + this.socketId : selectRoomId,   // 룸_id 
+      roomId :  selectRoomId,
+      socketId : this.chatSocket.id, // 소켓 id 로 구분 함  
       userId : userInfo.userName,// 있으면 id, 없으면 null
       userName :userInfo.userName, //
       //isMe : true // sendMessage 는 무조건 나
