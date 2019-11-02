@@ -99,10 +99,22 @@ export default class ChatStore {
     });
     this.selectRoomId = roomId;
   }
-  /* leaveRoom 에 대한 정책 필요 함  */
+  /* 
+    leaveRoom 에 대한 정책 필요 함 
+    현재 클라이언트는 필요없을 것 같다
+    어드민은 해줘야할듯 방 클릭, 다른 방 클릭 했을떄 
+  */
   @action
-  leaveRoom = () => {
-    
+  leaveChatRoom = (roomId) => {
+    const { socketId } = this.userInfo;
+    this.chatSocket.emit('leaveChatRoom', 
+    { 
+      messageInfo: { 
+        socketId : socketId,
+        roomId : roomId 
+      }
+     }   
+    )
   }
 
 
@@ -115,6 +127,7 @@ export default class ChatStore {
   //admin 입장
   @action
   joinChatRoom = e => {
+    this.leaveChatRoom(this.selectRoomId)
     console.log("[SEO] adminJoinRoom " , e.target.name)
     this.selectRoomId = e.target.name;
     this.chatSocket.emit('joinChatRoom', { messageInfo: { roomId : e.target.name}})
@@ -169,12 +182,12 @@ export default class ChatStore {
        this.chatSocket.on("getChatMessage", data => {
         
           console.log("[SEO] getChatMessage" , data)
-          const {chatMessageMap} = this;
+          const { chatMessageMap } = this;
           // let mySocketId = localStorage.getItem('socketId')
-           const { socketId } = this.userInfo;
+          const { socketId } = this.userInfo;
   
-           let { messageList } = data;
-           console.log("[SEO][getChatMessage] data " , data)  
+          let { messageList } = data;
+          console.log("[SEO][getChatMessage] data " , data)  
           if(isEmpty(messageList)){ //아무것도없으면 할일없음 
             return;
           }
@@ -225,10 +238,11 @@ export default class ChatStore {
         let chatMessage = {
           message : data.message,  //채팅 메세지 
           roomId : data.roomId,   // 룸_id 
-          socketId :  data.socketId, // 소켓 id 로 구분 함  
-          userId : data.userName,// 있으면 id, 없으면 null
-          userName : data.userName, //
-          isMe : isMe
+          socketId :  data.system ? null : data.socketId, // 소켓 id 로 구분 함  
+          userId : data.system ? null : data.userName,// 있으면 id, 없으면 null
+          userName : data.system ? null : data.userName, //
+          isMe : isMe,
+          system : data.system ? true : false
         }
         
         //현재 방에 메세지가 있다면 

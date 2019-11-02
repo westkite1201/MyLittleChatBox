@@ -102,8 +102,9 @@ const joinChatRoom = (messageInfo) => {
 /* 방에서 나가기  */
 /*  socketId에 해당되는 값 제거  */
 const leaveChatRoom  = (messageInfo) => {
+  console.log(messageInfo)
   const key = util.format("%s:%s", KEY_ROOM, messageInfo.roomId);
-  let socketId = data.socketId;
+  let socketId = messageInfo.socketId;
   redishelpers.redis.srem(key, socketId);
   
   let memberCount = getChatRoomMember(messageInfo)

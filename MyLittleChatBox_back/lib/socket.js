@@ -30,12 +30,17 @@ const connection = (io) =>{
             userRedis.joinChatRoom(data);
             socket.join(roomId) //socketJoin
             socket.emit('joinChatRoom', {message : socket.rooms})
-            socket.to(roomId).emit('joinChatRoom',  {message: "[joinChatRoom] roomd id is "+data.messageInfo.roomId })
+            socket.to(roomId).emit('sendChatMessage',  { system : true, message:  "admin님이 방에 들어왔습니다" })
         })
         //방 나가기
         socket.on('leaveChatRoom', function(data) {
-            socket.leave(data.roomId) //socketJoint
-            userRedis.leaveChatRoom(data);
+            let messageInfo = data.messageInfo;
+            const { roomId } = messageInfo;
+            socket.to(roomId).emit('sendChatMessage', { system : true, message : 'admin님이 방을 나갔습니다 .' })
+           
+            socket.leave(roomId) //socketLeave
+            console.log(socket.rooms)
+            userRedis.leaveChatRoom(messageInfo);
         })
 
         //방만들고 방에 들어가기    
