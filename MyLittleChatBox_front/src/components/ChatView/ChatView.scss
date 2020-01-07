@@ -1,40 +1,88 @@
-.chatViewWrapper{
+.chat-view-wrapper{
     height: 100%;
-    .messageWrapper{
-        max-height: calc(100% - 80px);
-        min-height: calc(100% - 80px);
-        overflow: auto;
-        .myMessage{
-            margin: 0.3rem;
-            min-width: 200px;
-            max-width: 400px;
-            float : right;
-            display: block;
-            background-color: rgba(235, 235, 8, 0.796);
-            clear:both;
-            border-radius: 0.5rem;
-            padding: 10px;
-            word-break: break-all;
-        }   
-        .anotherUserMessage{
-            margin: 0.3rem;
-            min-width: 200px;
-            max-width: 400px;
-            float: left;
-            display: block;
-            background-color: gainsboro;
-            clear:both;
-            border-radius: 0.5rem;
-            padding: 10px;
-            word-break: break-all;
-        }
+    background: white;
+    border-radius: 16px;
+    
+    .header{
+        height: 60px;
+        display: flex;
+        -webkit-box-align: center;
+        align-items: center;
+        border-top-left-radius: 16px;
+        border-top-right-radius: 16px;
+        font-size: 16px;
+        font-weight: 600;
+        color: white;
+        box-shadow: rgba(0, 0, 0, 0.1) 0px 4px 6px 0px;
+        z-index: 1;
+        position: relative;
+        background: linear-gradient(103deg, rgb(6, 139, 74) 0%, rgb(6, 139, 74) 50%, rgb(6, 139, 105)) 100% center;
+        overflow: hidden;
+        padding: 14px 80px 14px 60px
+    }
+    .message-wrapper{
+        position: relative;
+        width: 100%;
+        height: 387px;
+        display: flex;
+        flex-direction: column;
+        background-color: rgb(255, 255, 255);
+        overflow: hidden;
+        .message-container{
+            position: absolute;
+            top: 0px;
+            left: 0px;
+            right: 0px;
+            bottom: 0px;
+            overflow-x: hidden;
+            overflow-y: auto;
+            overflow: auto;
+            .system-message{
+
+            }
+            .myMessage{
+                margin: 0.3rem;
+                max-width: 230px;
+                border-top-right-radius: 3px;
+                max-width: 400px;
+                float : right;
+                display: block;
+                background-color: #fafa1fee;
+                clear:both;
+                border-radius: 0.5rem;
+                padding: 10px;
+                word-break: break-all;
+            }   
+            .anotherUserMessage{
+                margin: 0.3rem;
+                min-width: 200px;
+                max-width: 400px;
+                float: left;
+                display: block;
+                background-color: #ffffff;
+                clear:both;
+                padding: 10px;
+                word-break: break-all;
+            }
+    }
+    }
+    .chat-send-wrapper{
+        position: relative;
+        display: flex;
+        padding: 0 10px 0 10px;
+        -webkit-box-align: center;
+        align-items: center;
+        min-height: 54px;
+        background-color: rgb(255, 255, 255);
+        border-top: 1px solid rgba(81, 99, 120, 0.2);
+        border-bottom-right-radius: 16px;
+        border-bottom-left-radius: 16px;
     }
     .MuiTextField-root	{
-        height: 40px;
-        width: calc(100% - 80px);
+  
     }
     .MuiButton-root	{
-        height: 40px;
+     
     }
 }
 

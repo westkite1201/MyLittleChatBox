@@ -99,23 +99,6 @@ export default class ChatStore {
     });
     this.selectRoomId = roomId;
   }
-  /* 
-    leaveRoom 에 대한 정책 필요 함 
-    현재 클라이언트는 필요없을 것 같다
-    어드민은 해줘야할듯 방 클릭, 다른 방 클릭 했을떄 
-  */
-  @action
-  leaveChatRoom = (roomId) => {
-    const { socketId } = this.userInfo;
-    this.chatSocket.emit('leaveChatRoom', 
-    { 
-      messageInfo: { 
-        socketId : socketId,
-        roomId : roomId 
-      }
-     }   
-    )
-  }
 
 
   @action
@@ -130,10 +113,40 @@ export default class ChatStore {
     this.leaveChatRoom(this.selectRoomId)
     console.log("[SEO] adminJoinRoom " , e.target.name)
     this.selectRoomId = e.target.name;
-    this.chatSocket.emit('joinChatRoom', { messageInfo: { roomId : e.target.name}})
-    
+    this.chatSocket.emit('joinChatRoom', 
+    {
+      messageInfo: { 
+        roomId : e.target.name,
+        message : 'admin님이 방에 들어왔습니다',  //채팅 메세지 
+        socketId : 'system', // 소켓 id 로 구분 함  
+        userId : null,// 있으면 id, 없으면 null
+        userName : '', //
+      }
+    })
+      
     this.getChatMessage()
   };
+
+  /* 
+    leaveRoom 에 대한 정책 필요 함 
+    현재 클라이언트는 필요없을 것 같다
+    어드민은 해줘야할듯 방 클릭, 다른 방 클릭 했을떄 
+    */
+  @action
+  leaveChatRoom = (roomId) => {
+    const { socketId } = this.userInfo;
+    this.chatSocket.emit('leaveChatRoom', 
+    { 
+      messageInfo: { 
+        roomId : roomId,
+        message : 'admin님이 방에서 나갔습니다.', 
+        socketId : 'system',  
+        userId : null,// 있으면 id, 없으면 null
+        userName : '', //
+      }
+    })
+  }
+
   /* 테스트용  */
   @action
   getNowjoinedChatRoom = e => {
@@ -169,7 +182,7 @@ export default class ChatStore {
       console.log("[SEO] this.chatSocket " , this.chatSocket, chatSocket.id);
       this.chatSocket.on("joinChatRoom", data =>{
          console.log("[SEO] joinChatRoom ", data.message)
-       })
+      })
        /* redis connect 
           초기세팅시 이 함수를 통해서 데이터를 로컬에 세팅 함 
           들어갔을때 이 함수를 통해서 message를 가져와야함 
@@ -244,7 +257,7 @@ export default class ChatStore {
           isMe : isMe,
           system : data.system ? true : false
         }
-        
+        console.log("[SEO][sendChatMessage ON] chatMessage.roomId " , chatMessage.roomId)
         //현재 방에 메세지가 있다면 
         if (chatMessageMap.has(data.roomId)) {
           console.log('[SEO] chatMessageMap has')
@@ -299,6 +312,7 @@ export default class ChatStore {
       userName :userInfo.userName, //
       isMe : true // sendMessage 는 무조건 나
     }
+    console.log("[SEO][sendChatMessage] chatMessage.roomId " , chatMessage.roomId)
     
     //현재 방에 메세지가 있다면 
     if (chatMessageMap.has(chatMessage.roomId)) {

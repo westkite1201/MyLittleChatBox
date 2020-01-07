@@ -45,6 +45,9 @@ class AdminChat extends Component{
         console.log("chatMessageSendServer!!")
         const { sendChatMessage } = this.props;
         sendChatMessage(chatMsg, 'ADMIN')
+        this.setState({
+            chatMsg : ""
+        })
         //this.sendChatMessage(this.state.chatMsg)
     }
     handleSearch = (e) =>{
@@ -138,7 +141,6 @@ class AdminChat extends Component{
             <div className ='chatRooWrapper' height = "100%">
                 <button onClick = {getChatRoomList}>getChatRoomList</button>
                 <button onClick = {deleteRedisKey}>deleteRedisKey</button>
-                <button onClick = {getChatMessage}>getChatMessage</button>
                 <div className = {'roomList'} >
                     <form className = {'searchBox'} onSubmit={this.handleSearch}>
                         <SearchOutlinedIcon/>

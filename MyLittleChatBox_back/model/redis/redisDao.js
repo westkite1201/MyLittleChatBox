@@ -43,13 +43,20 @@ const deleteRedisKey = () => {
   redishelpers.redis.del(KEY_ROOM)
 }
 
-//message add 
-//message add 에 소켓 아이디가 필요한가.?
-//걍 roomId만 있으면 되는거아녀?
+
+//현재까지 읽은 인덱스를 저장
+//key, SOCKETID : ROOM_ID
+//VALUE : INDEXNUM
+const setReadIndex = () => {
+  
+}
+
+//message add
 const addMessage = (messageInfo) => {
   console.log("[SEO][redisDao]   messageInfo ", messageInfo)
   //const key = util.format("%s:%s:%s", KEY_MESSAGE, messageInfo.roomId, messageInfo.socketId);
   const key = util.format("%s:%s", KEY_MESSAGE, messageInfo.roomId);
+
   let message = messageInfo.message;
   let roomId = messageInfo.roomId;
   let socketId = messageInfo.socketId;

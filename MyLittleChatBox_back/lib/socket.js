@@ -2,6 +2,9 @@ const _ = require('lodash')
 const userRedis = require('../model/redis/redisDao');
 const REDIS = require('../model/redis/redis')
 
+
+const ADMIN_IN_ROOM_MSG = 'ADMIN님이 방에 입장하였습니다.'
+const ADMIN_LEAVE_ROOM_MSG = 'ADMIN님이 방에서 나갔습니다. '
 let roomId = ''
 let socketId = '';
 const connection = (io) =>{
@@ -23,23 +26,37 @@ const connection = (io) =>{
             //socket.to(roomId).emit('getChatRoomList',  roomList)
             //socket.emit('getChatRoomList', roomList)
         })
+        /* message INFO 넣ㄱ ㅣ */
         //방 들어가기 
         socket.on('joinChatRoom', (data) => {
-            console.log("[SEO][joinChatRoom] ", data.messageInfo.roomId)
-            let roomId = data.messageInfo.roomId
+            console.log("[SEO][joinChatRoom] data",  data, data.messageInfo.roomId)
+            let messageInfo = data.messageInfo;
+            const { roomId } = messageInfo;
+        
             userRedis.joinChatRoom(data);
+            userRedis.addMessage(messageInfo)
             socket.join(roomId) //socketJoin
-            socket.emit('joinChatRoom', {message : socket.rooms})
-            socket.to(roomId).emit('sendChatMessage',  { system : true, message:  "admin님이 방에 들어왔습니다" })
+            socket.emit('joinChatRoom', { message : socket.rooms })
+            /* 시스템 메세지  */
+            socket.to(roomId).emit('sendChatMessage',  { 
+                system : true,
+                roomId : roomId, 
+                message:  ADMIN_IN_ROOM_MSG
+            })
         })
         //방 나가기
         socket.on('leaveChatRoom', function(data) {
             let messageInfo = data.messageInfo;
             const { roomId } = messageInfo;
-            socket.to(roomId).emit('sendChatMessage', { system : true, message : 'admin님이 방을 나갔습니다 .' })
+            socket.to(roomId).emit('sendChatMessage', { 
+                system : true, 
+                roomId : roomId, 
+                message : ADMIN_LEAVE_ROOM_MSG
+            })
            
             socket.leave(roomId) //socketLeave
             console.log(socket.rooms)
+            userRedis.addMessage(messageInfo)
             userRedis.leaveChatRoom(messageInfo);
         })
 
@@ -60,6 +77,7 @@ const connection = (io) =>{
         socket.on('getChatRoomMember', function(data) {
             let roomMembers = userRedis.getChatRoomMember(data)
         })
+        
         socket.on('sendChatMessage',( data ) => {
             let messageInfo = {  
                 message : data.message,  //채팅 메세지 
