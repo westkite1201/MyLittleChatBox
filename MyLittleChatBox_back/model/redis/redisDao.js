@@ -14,7 +14,7 @@ const key_component_info = 'ComponentInfo';
 
 const KEY_ROOM =  'CHAT_ROOM'
 const KEY_MESSAGE = 'CHAT_MESSAGE'
-
+const KEY_INDEX = 'CHAT_INDEX'
 const returnStatusCode = async(successYn, data ) => {
   if(_.isNil(data)){
     data = ''
@@ -45,11 +45,35 @@ const deleteRedisKey = () => {
 
 
 //현재까지 읽은 인덱스를 저장
+//방에 들어감 -> 인덱스 저장
 //key, SOCKETID : ROOM_ID
 //VALUE : INDEXNUM
-const setReadIndex = () => {
-  
+const setReadIndex = (messageInfo) => {
+  let message = messageInfo.message;
+  let roomId = messageInfo.roomId;
+  let socketId = messageInfo.socketId;
+  let userId = messageInfo.userId;
+  let userName = messageInfo.userName;
+
+  const lenkey = util.format("%s:%s", KEY_MESSAGE, roomId);
+  let indexNum = redishelpers.redis.llen(lenkey)
+
+  const key = util.format("%s:%s:%s", KEY_INDEX, socketId, roomId);
+  return redishelpers.redis.set (key, indexNum)
 }
+
+const getReadIndex = () => {
+  let message = messageInfo.message;
+  let roomId = messageInfo.roomId;
+  let socketId = messageInfo.socketId;
+  let userId = messageInfo.userId;
+  let userName = messageInfo.userName;
+
+  const key = util.format("%s:%s:%s", KEY_INDEX, socketId, roomId);
+  return redishelpers.redis.get(key);
+
+}
+
 
 //message add
 const addMessage = (messageInfo) => {
@@ -62,6 +86,9 @@ const addMessage = (messageInfo) => {
   let socketId = messageInfo.socketId;
   let userId = messageInfo.userId;
   let userName = messageInfo.userName;
+  
+  /* 현재 읽은 index 저장 */
+  setReadIndex(messageInfo);
   const value = util.format("%s:%s:%s:%s:%s:%s", KEY_MESSAGE, message, roomId, socketId, userId, userName);
   //const key = util.format("%s:%s", KEY_MESSAGE, messageInfo.roomId);
   console.log("[SEO][redisDao] key , message", key, value)
@@ -71,7 +98,7 @@ const addMessage = (messageInfo) => {
 //message get
 //message add 에 소켓 아이디가 필요한가.?
 //그러면 조회도 룸아이디로만 
-const getChatMessage = (messageInfo) => {
+const getChatMessage = async (messageInfo) => {
   console.log("[SEO][redisDao]   getChatMessage ", messageInfo)
   //let testRoomId = "심술궂은 핑핑이_/chat#kcvuhUrYDXgmFWmbAAAD"
   //let testSocketId = "/chat#Nkx_awb3WXaVhedZAAAE"
@@ -80,6 +107,10 @@ const getChatMessage = (messageInfo) => {
   const key = util.format("%s:%s", KEY_MESSAGE, messageInfo.roomId);
   //let message = messageInfo.message;
   //console.log("[SEO][redisDao] key , message", key, message)
+
+  /* 현재 읽은 index 저장 */
+  setReadIndex(messageInfo);
+
   return redishelpers.redis.lrange(key, 0, -1);
 }
 /* chatRoom 생성  */
@@ -97,7 +128,8 @@ const getChatRoomList  = async() => {
   const key = util.format("%s", KEY_ROOM);
   //console.log("getChatRoomList", key)
   let resdata =  await returnStatusCode(redishelpers.redis.smembers(key))
-  //console.log("getChatRoomList2 ", resdata)
+  console.log("getChatRoomList2 ", resdata)
+  
   return resdata;
 }
 
@@ -366,7 +398,10 @@ module.exports = {
   leaveChatRoom  : leaveChatRoom,
 
 
+  setReadIndex : setReadIndex,
+  getReadIndex : getReadIndex,
   // Expire Test
   //expireTest: expireTest,
   setExpireDate: setExpireDate,
+
 }
