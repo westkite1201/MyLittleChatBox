@@ -10,7 +10,7 @@ import Icon from '@material-ui/core/Icon';
 /* Client Chat View  */
 class ChatView extends Component {
   state = {
-    chatMsg: '',
+    chatMsg: ''
     //chatSocket : io('http://localhost:3031/chat')
   };
   componentDidMount() {
@@ -21,10 +21,13 @@ class ChatView extends Component {
     // getRoomList();
   }
   /* 나가기  */
-  componentWillMount() {}
+  componentWillUnmount() {
+    // const { leaveChatRoom, selectRoomId } = this.props;
+    // leaveChatRoom(selectRoomId);
+  }
 
   //서버로 전송
-  chatMessageSendServer = e => {
+  chatMessageSendServer = (e) => {
     const { chatMsg, nickName } = this.state;
     e.preventDefault();
     console.log('chatMessageSendServer!!');
@@ -32,16 +35,16 @@ class ChatView extends Component {
     sendChatMessage(chatMsg, nickName);
     document.getElementById('inputMessage').value = '';
     this.setState({
-      chatMsg: '',
+      chatMsg: ''
     });
     //this.sendChatMessage(this.state.chatMsg)
   };
   //인풋 박스 핸들링
-  handleChatMessage = e => {
+  handleChatMessage = (e) => {
     console.log(this.state.chatMsg);
     console.log(e.target);
     this.setState({
-      chatMsg: e.target.value,
+      chatMsg: e.target.value
     });
   };
 
@@ -55,7 +58,7 @@ class ChatView extends Component {
     console.log(
       '[SEO] selectRoomId',
       selectRoomId,
-      chatMessageMap.get(selectRoomId),
+      chatMessageMap.get(selectRoomId)
     );
     let chatMessageList = [];
     if (!_.isNil(chatMessageMap.get(selectRoomId))) {
@@ -137,4 +140,5 @@ export default inject(({ chat }) => ({
   chatMessageMap: chat.chatMessageMap,
   chatMessage: chat.chatMessage,
   selectRoomId: chat.selectRoomId,
+  leaveChatRoom: chat.leaveChatRoom
 }))(observer(ChatView));
