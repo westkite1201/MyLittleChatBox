@@ -3,43 +3,41 @@ import io from "socket.io-client";
 import { isEmpty, isNil } from "lodash";
 import { Cookies } from "react-cookie";
 const cookies = new Cookies();
-//let chatMessageMap = new Map();
-export default class ChatStore {
-  @observable socket = "";
-  @observable chatSocket = "";
-  @observable socketId = ""; //..socketId는 connect 부분 외에 잡히지 않음 따로 변수로 뺴야할듯
-  @observable chatMessage = [];
-  @observable chatMessageMap = new Map();
-  @observable roomNameList = [];
 
-  @observable socketConnect = false;
+const chatStore = observable({
+  socket: "",
+  chatSocket: "",
+  socketId: "", //..socketId는 connect 부분 외에 잡히지 않음 따로 변수로 뺴야할듯
+  chatMessage: [],
+  chatMessageMap: new Map(),
+  roomNameList: [],
 
-  @observable selectRoomId = ""; //방리스트에서 클릭시 세팅
+  socketConnect: false,
 
-  @observable messageInfo = {
+  selectRoomId: "", //방리스트에서 클릭시 세팅
+
+  messageInfo: {
     message: "", //채팅 메세지
     roomId: "", // 룸_id
     socketId: "", // 소켓 id 로 구분 함
     userId: "", // 있으면 id, 없으면 null
     userName: "", //
-  };
-  @observable userInfo = {
+  },
+  userInfo: {
     socketId: "",
     userId: "",
     userName: "",
-  };
+  },
+  addPost(data) {
+    this.data.push(data);
+  },
+  get postLength() {
+    return this.data.length;
+  },
+});
 
-  //닉네임 만들기
-  nicknameMaker = () => {
-    //   let firstNameList = ['못되먹은','착해빠진','심술궂은', '징징대는'] ;
-    //   let secondNameList = ['상어','오징어','구렁이','핑핑이']
-
-    let firstNameList = ["A", "B", "C", "D"];
-    let secondNameList = ["1", "2", "3", "4"];
-    let first = Math.floor(Math.random() * firstNameList.length - 1) + 1;
-    let second = Math.floor(Math.random() * firstNameList.length - 1) + 1;
-    return firstNameList[first] + " " + secondNameList[second];
-  };
+//let chatMessageMap = new Map();
+export default class ChatStore {
   // 맨 처음 유저 info를 세팅한다
   @action
   initUserInfo = () => {

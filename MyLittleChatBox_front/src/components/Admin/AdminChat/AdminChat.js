@@ -1,31 +1,31 @@
-import React, { Component } from 'react';
-import { ListGroup, ListGroupItem } from 'reactstrap';
-import { observer, inject } from 'mobx-react';
-import { observable, action } from 'mobx';
-import TextField from '@material-ui/core/TextField';
-import ChatItem from '../../ChatView/ChatItem';
+import React, { Component } from "react";
+import { ListGroup, ListGroupItem } from "reactstrap";
+import { observer, inject } from "mobx-react";
+import { observable, action } from "mobx";
+import TextField from "@material-ui/core/TextField";
+import ChatItem from "../../ChatView/ChatItem";
 
-import SearchOutlinedIcon from '@material-ui/icons/SearchOutlined';
-import _ from 'lodash';
-import Button from '@material-ui/core/Button';
-import Icon from '@material-ui/core/Icon';
-import { isEmpty } from 'lodash';
-import ClearSharpIcon from '@material-ui/icons/ClearSharp';
-import './AdminChat.scss';
+import SearchOutlinedIcon from "@material-ui/icons/SearchOutlined";
+import _ from "lodash";
+import Button from "@material-ui/core/Button";
+import Icon from "@material-ui/core/Icon";
+import { isEmpty } from "lodash";
+import ClearSharpIcon from "@material-ui/icons/ClearSharp";
+import "./AdminChat.scss";
 
 class AdminChat extends Component {
   @observable searchResult = [];
   @observable roomList = [];
-  @observable roomSelect = '';
+  @observable roomSelect = "";
   state = {
-    nickName: 'SEOYEON',
-    chatMsg: '',
-    temp: []
+    nickName: "SEOYEON",
+    chatMsg: "",
+    temp: [],
     //chatSocket : io('http://localhost:3031/chat')
   };
   componentDidMount() {
     const { getChatRoomList, setSocketConnection } = this.props;
-    setSocketConnection('admin');
+    setSocketConnection("admin");
     getChatRoomList();
     // setInterval(()=>{
     //     getChatRoomList();
@@ -35,32 +35,32 @@ class AdminChat extends Component {
   handleChatMessage = (e) => {
     console.log(this.state.chatMsg);
     this.setState({
-      chatMsg: e.target.value
+      chatMsg: e.target.value,
     });
   };
   //서버로 전송
   chatMessageSendServer = (e) => {
     const { chatMsg, nickName } = this.state;
     e.preventDefault();
-    console.log('chatMessageSendServer!!');
+    console.log("chatMessageSendServer!!");
     const { sendChatMessage } = this.props;
-    sendChatMessage(chatMsg, 'ADMIN');
+    sendChatMessage(chatMsg, "ADMIN");
     this.setState({
-      chatMsg: ''
+      chatMsg: "",
     });
     //this.sendChatMessage(this.state.chatMsg)
   };
   handleSearch = (e) => {
-    console.log('handleSearch##');
+    console.log("handleSearch##");
     e.preventDefault();
     const { roomNameList } = this.props;
-    document.getElementById('input-with-icon-textfield').value = '';
+    document.getElementById("input-with-icon-textfield").value = "";
   };
 
   handleSearchKeyword = (e) => {
     const { roomNameList } = this.props;
     if (isEmpty(e.target.value)) {
-      console.log('none');
+      console.log("none");
       this.searchResult = [];
       console.log(this.searchResult);
     } else {
@@ -78,7 +78,7 @@ class AdminChat extends Component {
     return list.map((item, i) => {
       return (
         <ListGroupItem
-          className={selectRoomId === item ? 'active' : 'unactive'}
+          className={selectRoomId === item ? "active" : "unactive"}
           tag="button"
           onClick={joinChatRoom}
           key={i}
@@ -91,13 +91,13 @@ class AdminChat extends Component {
   };
   removeSearchResult = (e) => {
     this.setState({
-      searchResult: []
+      searchResult: [],
     });
   };
 
   handleSearchCancel = (e) => {
     console.log(e.key);
-    if (e.key === 'Escape') {
+    if (e.key === "Escape") {
       console.log(e.target.key);
       this.searchResult = [];
     }
@@ -109,11 +109,11 @@ class AdminChat extends Component {
       getChatRoomList,
       deleteRedisKey,
       roomNameList,
-      getChatMessage
+      getChatMessage,
     } = this.props;
 
     console.log(
-      '[SEO] selectRoomId',
+      "[SEO] selectRoomId",
       selectRoomId,
       chatMessageMap.get(selectRoomId)
     );
@@ -124,19 +124,19 @@ class AdminChat extends Component {
     let chatMessage = chatMessageList.map((item, i) => {
       let messageClassName;
       if (item.system) {
-        messageClassName = 'systemMessage';
+        messageClassName = "systemMessage";
       } else {
         if (item.isMe) {
-          messageClassName = 'myMessage';
+          messageClassName = "myMessage";
         } else if (!item.isMe) {
-          messageClassName = 'anotherUserMessage';
+          messageClassName = "anotherUserMessage";
         }
       }
       return !item.isMe ? (
         <ChatItem userName={item.userName} message={item.message} key={i} />
       ) : (
         <div className={messageClassName}>
-          {item.userName + ': ' + item.message}
+          {item.userName + ": " + item.message}
         </div>
       );
     });
@@ -145,8 +145,8 @@ class AdminChat extends Component {
       <div className="chatRooWrapper" height="100%">
         <button onClick={getChatRoomList}>getChatRoomList</button>
         <button onClick={deleteRedisKey}>deleteRedisKey</button>
-        <div className={'roomList'}>
-          <form className={'searchBox'} onSubmit={this.handleSearch}>
+        <div className={"roomList"}>
+          <form className={"searchBox"} onSubmit={this.handleSearch}>
             <SearchOutlinedIcon />
             <TextField
               id="input-with-icon-textfield"
@@ -165,7 +165,7 @@ class AdminChat extends Component {
           <div className="inputBox">
             <form
               onSubmit={this.chatMessageSendServer}
-              style={{ width: '100%' }}
+              style={{ width: "100%" }}
             >
               <TextField
                 id="inputMessage"
@@ -179,18 +179,18 @@ class AdminChat extends Component {
               <input
                 id="send-message"
                 type="submit"
-                style={{ display: 'none' }}
+                style={{ display: "none" }}
               />
               <label
                 htmlFor="send-message"
                 type="submit"
-                style={{ margin: '0px' }}
+                style={{ margin: "0px" }}
               >
                 <Button
                   variant="contained"
                   color="primary"
                   onClick={this.chatMessageSendServer}
-                  size={'small'}
+                  size={"small"}
                 >
                   Send
                   <Icon>send</Icon>
@@ -215,5 +215,5 @@ export default inject(({ chat }) => ({
   chatMessage: chat.chatMessage,
   joinChatRoom: chat.joinChatRoom,
   deleteRedisKey: chat.deleteRedisKey,
-  getChatMessage: chat.getChatMessage
+  getChatMessage: chat.getChatMessage,
 }))(observer(AdminChat));

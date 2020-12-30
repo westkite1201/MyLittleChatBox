@@ -1,19 +1,27 @@
-import React, { useRef } from 'react';
-//import UseStores from '../../lib/UseStores';
-import { observer } from 'mobx-react';
+import React from "react";
+//import UseStores from "../../lib/UseStores";
+import { observer, useLocalObservable } from "mobx-react";
+import useStore from "../../stores/useStore";
 
 //커스텀 훅
-// function useUserData() {
-//   const { chat } = UseStores();
-//   return useObserver(() => ({
-//     chatMessageMap: chat.chatMessageMap,
-//     selectRoomId: chat.selectRoomId
-//   }));
-// }
-const ChatViewNew = observer(({ chat }) => {
-  console.log('[seo] chat ', chat);
-  ///const { chatMessageMap, selectRoomId } = useUserData();
-  return <ul className="messages"></ul>;
+
+const ChatViewNew = observer(() => {
+  const { userStore, postStore } = useStore();
+
+  const state = useLocalObservable(() => ({
+    name: "",
+    password: "",
+    onChangeName(e) {
+      this.name = e.target.value;
+    },
+  }));
+
+  return (
+    <ul className="messages">
+      <button onClick={() => postStore.addPost("hello")}></button>
+      {postStore.postLength}
+    </ul>
+  );
 });
 
 export default ChatViewNew;
