@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState, Fragment } from 'react';
 import { ListGroup, ListGroupItem } from 'reactstrap';
 import { observer, useLocalObservable } from 'mobx-react';
 import TextField from '@material-ui/core/TextField';
@@ -14,6 +14,8 @@ import './AdminChat.scss';
 import useStore from '../../../stores/useStore';
 
 const AdminChat = observer(() => {
+  const [isAdmin, setIsAdmin] = useState(false)
+  const [adminId, setAdminId] = useState('')
   const { chatStore } = useStore();
   let searchResult = [];
   const state = useLocalObservable(() => ({
@@ -35,9 +37,11 @@ const AdminChat = observer(() => {
   }));
 
   useEffect(() => {
-    chatStore.setSocketConnection('admin');
-    chatStore.getChatRoomList();
-  }, []);
+    if (isAdmin) {
+      chatStore.setSocketConnection(adminId);
+      chatStore.getChatRoomList();
+    }
+  }, [isAdmin]);
 
   const handleSearch = () => {};
   //   handleSearch = (e) => {
@@ -140,8 +144,18 @@ const AdminChat = observer(() => {
     chatStore.deleteRedisKey();
   }
 
-  return (
-    <div className="chatRooWrapper" height="100%">
+  function makeAdminPageButton() {
+    return (
+      <div>
+        <button onClick={() => setIsAdmin(true)}>이건 admin만들기 버튼</button>
+        <input type='text' placeholder='admin id' onChange={(e) => {setAdminId(e.target.value)}}></input>
+      </div>
+    )
+  }
+
+  function makeAdminPage() {
+    return (
+      <Fragment>
       <button onClick={handleGetChatRoomList}>getChatRoomList</button>
       <button onClick={handleDeleteRedisKey}>deleteRedisKey</button>
       <div className={'roomList'}>
@@ -198,6 +212,12 @@ const AdminChat = observer(() => {
           </form>
         </div>
       </div>
+      </Fragment>
+    )
+  }
+  return (
+    <div className="chatRooWrapper" height="100%">
+      {isAdmin ? makeAdminPage() : makeAdminPageButton()}
     </div>
   );
 });
