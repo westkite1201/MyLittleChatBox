@@ -107,9 +107,18 @@ const chatStore = observable({
     this.selectRoomId = roomId;
   },
 
-  getChatRoomList() {
-    console.log('[seoyeon] this.selectRoomId', this);
-    this.chatSocket.emit('getChatRoomList');
+  getChatRoomList(isAdmin) {
+    const { userInfo, socketId } = this;
+    let roomId = userInfo.userName + '_' + userInfo.socketId;
+    this.chatSocket.emit('getChatRoomList', {
+      messageInfo: {
+        roomId: roomId,
+        message: 'admin님이 방에서 나갔습니다.',
+        socketId: 'system',
+        userId: isAdmin ? 'ADMIN' : null, // 있으면 id, 없으면 null
+        userName: '', //
+      },
+    });
   },
 
   /* 
@@ -276,7 +285,7 @@ const chatStore = observable({
       });
       /* 방 생성  */
       this.chatSocket.on('createChatRoom', (data) => {
-        console.log('[SEO][createChatRoom] -> server Response ', data);
+        console.log('[SEOYEON][createChatRoom] -> server Response ', data);
       });
       /* 방 리스트 가져오기  */
       this.chatSocket.on('getChatRoomList', (resData) => {

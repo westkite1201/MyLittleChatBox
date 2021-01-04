@@ -9,9 +9,6 @@ const key_using_user = 'Component_Using_User';
 const key_user_info = 'User_Info';
 const key_component_location = 'Component_Location_Info';
 
-const key_route_info = 'RouteInfo';
-const key_component_info = 'ComponentInfo';
-
 const KEY_ROOM = 'CHAT_ROOM';
 const KEY_MESSAGE = 'CHAT_MESSAGE';
 const KEY_INDEX = 'CHAT_INDEX';
@@ -26,7 +23,7 @@ const returnStatusCode = async (successYn, data) => {
   let statusInfo = {
     message: '',
     statusCode: '',
-    data: data
+    data: data,
   };
   if (successYn) {
     statusInfo.message = 'suceess';
@@ -40,14 +37,14 @@ const returnStatusCode = async (successYn, data) => {
 };
 /* 레디스 키 제거 */
 const deleteRedisKey = () => {
-  redishelpers.redis.del(KEY_ROOM);
+  redishelpers.redis.del(KEY_ROOM + ':ADMIN');
 };
 
 //현재까지 읽은 인덱스를 저장
 //방에 들어감 -> 인덱스 저장
 //key, SOCKETID : ROOM_ID
 //VALUE : INDEXNUM
-const setReadIndex = (messageInfo) => {
+const setReadIndex = async (messageInfo) => {
   let message = messageInfo.message;
   let roomId = messageInfo.roomId;
   let socketId = messageInfo.socketId;
@@ -55,9 +52,10 @@ const setReadIndex = (messageInfo) => {
   let userName = messageInfo.userName;
 
   const lenkey = util.format('%s:%s', KEY_MESSAGE, roomId);
-  let indexNum = redishelpers.redis.llen(lenkey);
+  let indexNum = await redishelpers.redis.llen(lenkey);
 
   const key = util.format('%s:%s:%s', KEY_INDEX, socketId, roomId);
+  console.log('[SEO] SET_READ_INDEX ', key, indexNum);
   return redishelpers.redis.set(key, indexNum);
 };
 
@@ -93,7 +91,7 @@ const addMessage = (messageInfo) => {
     roomId,
     socketId,
     userId,
-    userName
+    userName,
   );
   //const key = util.format("%s:%s", KEY_MESSAGE, messageInfo.roomId);
   console.log('[SEO][redisDao] key , message', key, value);
@@ -123,16 +121,18 @@ const getChatMessage = async (messageInfo) => {
 /* key = roomId + socketId */
 /* value socketId */
 const createChatRoom = (data) => {
-  const key = util.format('%s', KEY_ROOM);
-  //console.log("[SEO][createChatRoom] ",data.messageInfo.roomId)
+  /*현재 클라이언트느 어드민이랑만 연결되므로  */
+  const key = util.format('%s:%s', KEY_ROOM, 'ADMIN');
+  //const key = util.format('%s:%s', KEY_ROOM, data.messageInfo.roomId);
+  console.log('[SEO][createChatRoom] KEY ', key);
   return returnStatusCode(
-    redishelpers.redis.sadd(key, data.messageInfo.roomId)
+    redishelpers.redis.sadd(key, data.messageInfo.roomId),
   ); // roomList를 위해
 };
 
-const getChatRoomList = async () => {
-  const key = util.format('%s', KEY_ROOM);
-  //console.log("getChatRoomList", key)
+const getChatRoomList = async (data) => {
+  const key = util.format('%s:%s', KEY_ROOM, 'ADMIN');
+  console.log('[SEO][getChatRoomList] KEY ', key);
   let resdata = await returnStatusCode(redishelpers.redis.smembers(key));
   console.log('getChatRoomList2 ', resdata);
 
@@ -169,196 +169,6 @@ const getChatRoomMember = (messageInfo) => {
   return redishelpers.redis.smembers(key);
 };
 
-const setUserStatus = (data) => {
-  console.log('----- setUserStatus --------');
-  console.log('data =>', data);
-  return redishelpers.redis.hset(
-    data.key,
-    data.user_id,
-    JSON.stringify(data.user_status)
-  );
-};
-
-const getUserStatus = (data) => {
-  console.log('----- getUserStatus --------');
-  console.log('data =>', data);
-  return redishelpers.redis.hget(data.key, data.user_id);
-};
-
-const getAllComponent = () => {
-  console.log('----- getAllComponent --------');
-
-  const key = util.format('%s:*', key_component_logic);
-  return redishelpers.redis.keys(key);
-};
-
-const getMyComponent = (data) => {
-  console.log('----- getMyComponent --------');
-  console.log('data =>', data);
-  const key = util.format('%s:%s', key_using_user, data.component_id);
-  console.log('key =>', key);
-
-  return redishelpers.redis.sismember(key, data.user_id);
-};
-
-// Component사용자에 user_id 추가.
-const setMyComponent = (data) => {
-  console.log('----- setMyComponent --------');
-  console.log('data =>', data);
-
-  const key = util.format('%s:%s', key_using_user, data.component_id);
-  console.log('key =>', key);
-
-  return redishelpers.redis.sadd(key, data.user_id);
-};
-
-// 컴포넌트에 하위 컴포넌트 or 로직 셋팅
-const setComponentLogic = (data) => {
-  console.log('----- setComponentLogic --------');
-  console.log('data =>', data);
-
-  const key = util.format('%s:%s', key_component_logic, data.target_component);
-  console.log('key =>', key);
-
-  return redishelpers.redis.sadd(key, data.logic_list);
-};
-
-const getZsetMaxscore = (data) => {
-  console.log('----- getZsetMaxscore --------');
-  console.log('data =>', data);
-
-  const key = util.format('%s:%s', key_user_info, data.user_id);
-  console.log('key =>', key);
-
-  return redishelpers.redis.zrange(key, -1, -1, 'WITHSCORES');
-};
-
-const setUserInfo = (data) => {
-  console.log('----- setUserInfo --------');
-  console.log('data =>', data);
-
-  const key = util.format('%s:%s', key_user_info, data.user_id);
-  console.log('key =>', key);
-
-  return redishelpers.redis.zadd(key, data.score, data.user_info);
-};
-
-const getUserInfo = (data) => {
-  console.log('----- getUserInfo --------');
-  console.log('data =>', data);
-
-  const key = util.format('%s:%s', key_user_info, data.user_id);
-  console.log('key =>', key);
-
-  return redishelpers.redis.zrangebyscore(key, data.max_score, data.max_score);
-};
-
-///////////////////////////////
-const setUserComponents = (data) => {
-  console.log('----- setUserComponents --------');
-  console.log(data);
-
-  const key = util.format(
-    '%s:%s:%s',
-    key_component_info,
-    data.user_id,
-    data.page_number
-  );
-  console.log('key =>', key);
-  return redishelpers.redis.sadd(key, data.component_list);
-};
-
-const getUserComponents = (data) => {
-  console.log('----- getUserComponents --------');
-  console.log(data);
-
-  const key = util.format(
-    '%s:%s:%s',
-    key_component_info,
-    data.user_id,
-    data.page_number
-  );
-  console.log('key =>', key);
-  return redishelpers.redis.smembers(key);
-};
-
-const getUserPages = (data) => {
-  console.log('----- getUserPages --------');
-  console.log(data);
-
-  const key = util.format('%s:%s', key_route_info, data.user_id);
-  console.log('key =>', key);
-  return redishelpers.redis.zrange(key, 0, -1, 'WITHSCORES');
-};
-
-const setUserPages = (data) => {
-  console.log('----- getUserPages --------');
-  console.log(data);
-
-  const key = util.format('%s:%s', key_route_info, data.user_id);
-  console.log('key =>', key);
-  return redishelpers.redis.zadd(key, data.page_number, data.page_name);
-};
-
-const deleteUserComponent = (data) => {
-  console.log('----- deleteUserComponent --------');
-  console.log(data);
-
-  const key = util.format(
-    '%s:%s:%s',
-    key_component_info,
-    data.user_id,
-    data.page_number
-  );
-  console.log('key =>', key);
-  return redishelpers.redis.del(key);
-};
-
-const deleteUserPageByPageNumber = (data) => {
-  console.log('----- deleteUserPageByPageNumber --------');
-  console.log(data);
-
-  const key = util.format('%s:%s', key_route_info, data.user_id);
-  console.log('key =>', key);
-  return redishelpers.redis.zremrangebyscore(
-    key,
-    data.page_number,
-    data.page_number
-  );
-};
-
-const setComponentLocation = (data) => {
-  console.log('----- setComponentLocation --------');
-  console.log(data);
-
-  const key = util.format(
-    '%s:%s:%s:%s',
-    key_component_location,
-    data.user_id,
-    data.page_name,
-    data.component_info
-  );
-  console.log('key =>', key);
-
-  return redishelpers.redis.set(key, data.component_location);
-};
-
-const getComponentLocation = (data) => {
-  console.log('----- getComponentLocation --------');
-  console.log(data);
-
-  const key = util.format(
-    '%s:%s:%s',
-    key_component_location,
-    data.user_id,
-    data.page_name,
-    data.component_info
-  );
-  console.log('key =>', key);
-
-  return redishelpers.redis.get(key);
-};
-
 /////////////////////////////////
 
 //// expire test
@@ -386,27 +196,6 @@ module.exports = {
   key_user_info: key_user_info,
   key_component_location: key_component_location,
 
-  // methods
-  setUserStatus: setUserStatus,
-  getUserStatus: getUserStatus,
-  getAllComponent: getAllComponent,
-  getMyComponent: getMyComponent,
-  setMyComponent: setMyComponent,
-  setComponentLogic: setComponentLogic,
-  getZsetMaxscore: getZsetMaxscore,
-  setUserInfo: setUserInfo,
-  getUserInfo: getUserInfo,
-
-  // User Route Page Methods
-  setUserComponents: setUserComponents,
-  getUserComponents: getUserComponents,
-  getUserPages: getUserPages,
-  setUserPages: setUserPages,
-  deleteUserComponent: deleteUserComponent,
-  deleteUserPageByPageNumber: deleteUserPageByPageNumber,
-  setComponentLocation: setComponentLocation,
-  getComponentLocation: getComponentLocation,
-
   //key
   //CHAT 함수
   deleteRedisKey: deleteRedisKey,
@@ -417,10 +206,11 @@ module.exports = {
   getChatRoomMember: getChatRoomMember,
   joinChatRoom: joinChatRoom,
   leaveChatRoom: leaveChatRoom,
+  distroyRoom: distroyRoom,
 
   setReadIndex: setReadIndex,
   getReadIndex: getReadIndex,
   // Expire Test
   //expireTest: expireTest,
-  setExpireDate: setExpireDate
+  setExpireDate: setExpireDate,
 };

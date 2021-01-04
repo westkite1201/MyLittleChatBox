@@ -133,7 +133,8 @@ const AdminChat = observer(() => {
     return chatMessage;
   }
   function handleGetChatRoomList() {
-    chatStore.getChatRoomList();
+    let isAdmin = true;
+    chatStore.getChatRoomList(isAdmin);
   }
   function handleDeleteRedisKey() {
     chatStore.deleteRedisKey();

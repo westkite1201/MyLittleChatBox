@@ -15,9 +15,10 @@ const connection = (io) => {
     });
     //방 가져오기
     socket.on('getChatRoomList', async (data) => {
+      console.log('data', data);
       console.log("'[SEO] getChatRoomList", roomId);
-      let roomList = await userRedis.getChatRoomList();
-      // console.log('[SEO] ROOMLIST ', roomList)
+      let roomList = await userRedis.getChatRoomList(data);
+      console.log('[SEO] ROOMLIST ', roomList);
       // socket.to(roomId).emit('getChatRoomList', roomList)
       socket.join(roomId);
       console.log(socket.rooms);
@@ -66,7 +67,7 @@ const connection = (io) => {
       roomId = data.messageInfo.roomId;
       socketId = data.messageInfo.socketId;
       let response = userRedis.createChatRoom(data);
-      console.log(response);
+      console.log('[createChatRoom] response', response);
 
       socket.join(roomId);
       socket.to(roomId).emit('createChatRoom', { response: response });
@@ -123,6 +124,7 @@ const connection = (io) => {
     });
     socket.on('disconnect', function () {
       console.log('diconnect', roomId);
+      //REDIS 삭제
       socket.leave(roomId); //socketLeave
       //socket.broadcast.emit('disconnect', { data: 'disconnect' });
     });
