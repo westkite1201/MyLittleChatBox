@@ -1,5 +1,5 @@
-import * as React from "react";
-import { userStore, postStore } from "./store";
+import { userStore, postStore } from './store';
+import chatStore from './chatStore';
 
 function useStore() {
   // const store = React.useContext(storeContext);
@@ -7,7 +7,7 @@ function useStore() {
   //   // this is especially useful in TypeScript so you don't need to be checking for null all the time
   //   throw new Error('useStore must be used within a StoreProvider.');
   // }
-  return { userStore, postStore };
+  return { userStore, postStore, chatStore };
 }
 
 export default useStore;

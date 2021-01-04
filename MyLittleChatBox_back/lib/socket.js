@@ -40,7 +40,7 @@ const connection = (io) => {
       socket.to(roomId).emit('sendChatMessage', {
         system: true,
         roomId: roomId,
-        message: ADMIN_IN_ROOM_MSG
+        message: ADMIN_IN_ROOM_MSG,
       });
     });
     //방 나가기
@@ -51,7 +51,7 @@ const connection = (io) => {
       socket.to(roomId).emit('sendChatMessage', {
         system: true,
         roomId: roomId,
-        message: ADMIN_LEAVE_ROOM_MSG
+        message: ADMIN_LEAVE_ROOM_MSG,
       });
 
       socket.leave(roomId); //socketLeave
@@ -82,7 +82,7 @@ const connection = (io) => {
         roomId: data.roomId, // 룸_id
         socketId: data.socketId, // 소켓 id 로 구분 함
         userId: data.userName, // 있으면 id, 없으면 null
-        userName: data.userName //
+        userName: data.userName, //
       };
       console.log('[SEO] messageInfo', messageInfo);
       userRedis.addMessage(messageInfo);
@@ -97,7 +97,7 @@ const connection = (io) => {
         roomId: data.roomId, // 룸_id
         socketId: data.socketId, // 소켓 id 로 구분 함
         userId: data.userName, // 있으면 id, 없으면 null
-        userName: data.userName //
+        userName: data.userName, //
       };
 
       let messageList = await userRedis.getChatMessage(messageInfo);
@@ -109,7 +109,7 @@ const connection = (io) => {
           roomId: messageInfoAssemble[2], // 룸_id
           socketId: messageInfoAssemble[3], // 소켓 id 로 구분 함
           userId: messageInfoAssemble[4], // 있으면 id, 없으면 null
-          userName: messageInfoAssemble[5] //
+          userName: messageInfoAssemble[5], //
         };
         return messageInfo;
       });
@@ -121,10 +121,15 @@ const connection = (io) => {
         .to(messageInfo.roomId)
         .emit('getChatMessage', { messageList: messageList });
     });
+    socket.on('disconnect', function () {
+      console.log('hello', roomId);
+      socket.leave(roomId); //socketLeave
+      //socket.broadcast.emit('disconnect', { data: 'disconnect' });
+    });
 
     socket.on('getNowjoinedChatRoom', () => {});
   });
 };
 module.exports = {
-  connection: connection
+  connection: connection,
 };

@@ -1,7 +1,5 @@
 import React, { Component } from 'react';
-import _ from 'lodash';
 import ChatView from '../ChatView';
-import ChatViewNew from '../ChatView/ChatViewNew';
 import './Home.scss';
 /* Client Chat View  */
 class Home extends Component {
@@ -9,8 +7,8 @@ class Home extends Component {
     return (
       <div className="home-wrapper">
         <div className="chat-view-container">
+          {/*<ChatView />*/}
           <ChatView />
-          <ChatViewNew />
         </div>
       </div>
     );

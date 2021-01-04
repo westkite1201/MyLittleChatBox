@@ -10,7 +10,7 @@ const dashboardRoutes = [
     sidebarName: 'Home',
     navbarName: 'Home',
     icon: Home,
-    component: Home
+    component: Home,
   },
   {
     sideView: true,
@@ -19,7 +19,7 @@ const dashboardRoutes = [
     sidebarName: 'Chat',
     navbarName: 'Chat',
     icon: Chat,
-    component: Chat
+    component: Chat,
   },
 
   {
@@ -29,8 +29,8 @@ const dashboardRoutes = [
     sidebarName: 'AdminChat',
     navbarName: 'AdminChat',
     icon: AdminChat,
-    component: AdminChat
-  }
+    component: AdminChat,
+  },
 
   //{ redirect: true, path: "/", to: "/dashboard", navbarName: "Redirect" }
 ];
