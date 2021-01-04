@@ -132,11 +132,17 @@ const AdminChat = observer(() => {
     });
     return chatMessage;
   }
+  function handleGetChatRoomList() {
+    chatStore.getChatRoomList();
+  }
+  function handleDeleteRedisKey() {
+    chatStore.deleteRedisKey();
+  }
 
   return (
     <div className="chatRooWrapper" height="100%">
-      <button onClick={chatStore.getChatRoomList}>getChatRoomList</button>
-      <button onClick={chatStore.deleteRedisKey}>deleteRedisKey</button>
+      <button onClick={handleGetChatRoomList}>getChatRoomList</button>
+      <button onClick={handleDeleteRedisKey}>deleteRedisKey</button>
       <div className={'roomList'}>
         <form className={'searchBox'} onSubmit={handleSearch}>
           <SearchOutlinedIcon />

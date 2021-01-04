@@ -169,7 +169,6 @@ const chatStore = observable({
       const chatSocket = io('http://localhost:3031/chat');
 
       /* connect 되면 userInfo setting 처리   */
-      /* 동기로 진행이 되는지.? */
       chatSocket.on('connect', () => {
         console.log('[SEOYEON] connect ', chatSocket.id);
         this.socketId = chatSocket.id; //chatSocket id 세팅

@@ -122,7 +122,7 @@ const connection = (io) => {
         .emit('getChatMessage', { messageList: messageList });
     });
     socket.on('disconnect', function () {
-      console.log('hello', roomId);
+      console.log('diconnect', roomId);
       socket.leave(roomId); //socketLeave
       //socket.broadcast.emit('disconnect', { data: 'disconnect' });
     });
