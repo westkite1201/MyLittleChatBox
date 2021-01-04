@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState, Fragment } from 'react';
 //import UseStores from "../../lib/UseStores";
 import { observer, useLocalObservable } from 'mobx-react';
 import useStore from '../../stores/useStore';
@@ -11,11 +11,14 @@ import _ from 'lodash';
 
 const ChatView = observer(() => {
   const { chatStore } = useStore();
-
+  const [makeRoom, setMakeRoom] = useState(false);
+  const [clientId, setClientId] = useState('');
   useEffect(() => {
-    chatStore.setSocketConnection();
+    if (makeRoom) {
+      chatStore.setSocketConnection(clientId);
+    }
     //chatStore.initUserInfo();
-  }, []);
+  }, [makeRoom]);
 
   const state = useLocalObservable(() => ({
     name: '',
@@ -65,8 +68,20 @@ const ChatView = observer(() => {
     return chatMessage;
   }
 
-  return (
-    <div className="chat-view-wrapper">
+  function makeRoomButton() {
+    return (
+      <div>
+        <button onClick={() => setMakeRoom(true)}>
+          채팅방 만들기
+        </button>
+        <input type='text' placeholder='client id' onChange={(e) => {setClientId(e.target.value)}}></input>
+      </div>
+    )
+  }
+
+  function makeChatView() {
+    return (
+      <Fragment>
       <div className="header">
         <span>대화를 시작합시다!</span>
       </div>
@@ -99,6 +114,12 @@ const ChatView = observer(() => {
           </label>
         </form>
       </div>
+      </Fragment>
+    )
+  }
+  return (
+    <div className="chat-view-wrapper">
+      {makeRoom ? makeChatView() : makeRoomButton()}
     </div>
   );
 });

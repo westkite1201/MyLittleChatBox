@@ -42,7 +42,7 @@ const chatStore = observable({
     return this.data.length;
   },
   initUserInfo(socketId) {
-    console.log('[SEO][InitUserInfo] socketId = ', socketId);
+    // console.log('[SEO][InitUserInfo] socketId = ', socketId);
 
     let userInfo = {
       socketId: socketId,
@@ -82,16 +82,16 @@ const chatStore = observable({
     cookies.set('userId', userInfo.userId, { expires: tomorrow });
     cookies.set('userName', userInfo.userName, { expires: tomorrow });
     // }
-    console.log('[SEO][ COOKIE ] ', cookies.get('socketId'));
-    console.log('[SEOYEON] userInfo 1', userInfo);
+    // console.log('[SEO][ COOKIE ] ', cookies.get('socketId'));
+    // console.log('[SEOYEON] userInfo 1', userInfo);
     this.userInfo = userInfo;
-    console.log('[SEOYEON] userInfo 2', this.userInfo);
+    // console.log('[SEOYEON] userInfo 2', this.userInfo);
   },
   //client 방 만들기
   createChatRoom() {
     const { userInfo, socketId } = this;
     let roomId = userInfo.userName + '_' + userInfo.socketId;
-    console.log('[SEOYEON] roomid ', roomId);
+    // console.log('[SEOYEON] roomid ', roomId);
     let messageInfo = {
       message: 'createChatRoom', //채팅 메세지
       roomId: roomId, // 룸_id
@@ -108,7 +108,7 @@ const chatStore = observable({
   },
 
   getChatRoomList() {
-    console.log('[seoyeon] this.selectRoomId', this);
+    // console.log('[seoyeon] this.selectRoomId', this);
     this.chatSocket.emit('getChatRoomList');
   },
 
@@ -150,41 +150,41 @@ const chatStore = observable({
 
   /* 테스트용  */
   getNowjoinedChatRoom(e) {
-    console.log('[SEO] getNowjoinedChatRoom ');
+    // console.log('[SEO] getNowjoinedChatRoom ');
     this.chatSocket.emit('getNowjoinedChatRoom', '');
 
     //this.getChatMessage()
   },
 
   deleteRedisKey() {
-    console.log('[SEO] deleteRedisKey');
+    // console.log('[SEO] deleteRedisKey');
     this.chatSocket.emit('deleteRedisKey');
   },
 
   //socketConnection
 
-  setSocketConnection() {
-    console.log('[SEOYEON] setSocketConnection hello ');
+  setSocketConnection(inputSocketId) {
+    // console.log('[SEOYEON] setSocketConnection hello ');
     if (isEmpty(this.chatSocket)) {
       const chatSocket = io('http://localhost:3031/chat');
 
       /* connect 되면 userInfo setting 처리   */
       chatSocket.on('connect', () => {
-        console.log('[SEOYEON] connect ', chatSocket.id);
-        this.socketId = chatSocket.id; //chatSocket id 세팅
-        this.initUserInfo(chatSocket.id);
+        console.log('[SEOYEON] connect ', chatSocket.id, 'SocketId: ', inputSocketId);
+        this.socketId = inputSocketId; //chatSocket id 세팅
+        this.initUserInfo(inputSocketId);
         this.socketConnect = true;
         this.createChatRoom();
       });
       chatSocket.on('disconnect', function () {
-        console.log('[SEOYEON] disconnect client event....');
+        // console.log('[SEOYEON] disconnect client event....');
       });
 
       this.chatSocket = chatSocket; //chatSocket setting
 
       /* chat room join */
       this.chatSocket.on('joinChatRoom', (data) => {
-        console.log('[SEO] joinChatRoom -> server Response', data.message);
+        // console.log('[SEO] joinChatRoom -> server Response', data.message);
       });
 
       /* redis connect 
@@ -198,7 +198,7 @@ const chatStore = observable({
          */
 
       this.chatSocket.on('getChatMessage', (data) => {
-        console.log('[SEOYEON] getChatMessage -> server Response', data);
+        // console.log('[SEOYEON] getChatMessage -> server Response', data);
         const { chatMessageMap } = this;
         const { socketId } = this.userInfo;
 
@@ -229,11 +229,11 @@ const chatStore = observable({
 
         //현재 방에 메세지가 있다면
         if (chatMessageMap.has(selectRoomId)) {
-          console.log('[SEO] chatMessageMap has');
+          // console.log('[SEO] chatMessageMap has');
           chatMessageMap.set(selectRoomId, messageList);
         } else {
           //처음 세팅
-          console.log('[SEO] chatMessageMap has not');
+          // console.log('[SEO] chatMessageMap has not');
           chatMessageMap.set(selectRoomId, messageList);
         }
         this.selectRoomId = selectRoomId;
@@ -242,7 +242,7 @@ const chatStore = observable({
       /* message chat  */
       /* serverRecive  */
       this.chatSocket.on('sendChatMessage', (data) => {
-        console.log('[SEO] sendChatMessage -> serverRecive ', data);
+        // console.log('[SEO] sendChatMessage -> serverRecive ', data);
         const { chatMessageMap } = this;
         // let mySocketId = localStorage.getItem('socketId')
         const { socketId } = this.userInfo;
@@ -280,7 +280,7 @@ const chatStore = observable({
       });
       /* 방 리스트 가져오기  */
       this.chatSocket.on('getChatRoomList', (resData) => {
-        console.log('[SEO][getChatRoomList] -> server Response', resData);
+        // console.log('[SEO][getChatRoomList] -> server Response', resData);
         if (resData.statusCode === 200) {
           this.roomNameList = resData.data;
         }
@@ -292,7 +292,7 @@ const chatStore = observable({
   test: '',
   sendTest(message) {
     this.test = message;
-    console.log('sendTest ', this.test);
+    // console.log('sendTest ', this.test);
   },
 
   /*
@@ -300,7 +300,7 @@ const chatStore = observable({
     채팅 메시지 보내기
   */
   sendChatMessage(message, userName) {
-    console.log('[SEO] !sendChatMessage!', message);
+    // console.log('[SEO] !sendChatMessage!', message);
     let { chatMessageMap, userInfo, selectRoomId } = this;
     //admin일 경우
     //임시
@@ -320,14 +320,14 @@ const chatStore = observable({
 
     //현재 방에 메세지가 있다면
     if (chatMessageMap.has(chatMessage.roomId)) {
-      console.log('[SEO] chatMessageMap has');
+      // console.log('[SEO] chatMessageMap has');
       let tempChatMessageList = [];
       tempChatMessageList = chatMessageMap.get(chatMessage.roomId);
       tempChatMessageList.push(chatMessage);
       chatMessageMap.set(chatMessage.roomId, tempChatMessageList);
     } else {
       //처음 세팅
-      console.log('[SEO] chatMessageMap has not');
+      // console.log('[SEO] chatMessageMap has not');
       chatMessageMap.set(chatMessage.roomId, [chatMessage]);
     }
     // 서버로 자신의 정보를 전송한다.
@@ -345,7 +345,7 @@ const chatStore = observable({
       userName: userInfo.userName, //
       //isMe : true // sendMessage 는 무조건 나
     };
-    console.log('[SEO] getChatMessage client -> server ', chatMessage);
+    // console.log('[SEO] getChatMessage client -> server ', chatMessage);
     this.chatSocket.emit('getChatMessage', chatMessage);
   },
 });
