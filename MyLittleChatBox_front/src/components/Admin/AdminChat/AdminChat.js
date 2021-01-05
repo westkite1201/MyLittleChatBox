@@ -1,28 +1,46 @@
-import React, { useEffect, useState, Fragment } from 'react';
-import { ListGroup, ListGroupItem } from 'reactstrap';
+import React, { useEffect, useState, useRef, Fragment } from 'react';
 import { observer, useLocalObservable } from 'mobx-react';
+import { autorun } from 'mobx';
 import TextField from '@material-ui/core/TextField';
 import ChatItem from '../../ChatView/ChatItem';
-
 import SearchOutlinedIcon from '@material-ui/icons/SearchOutlined';
 import _ from 'lodash';
 import Button from '@material-ui/core/Button';
 import Icon from '@material-ui/core/Icon';
-import { isEmpty } from 'lodash';
 import ClearSharpIcon from '@material-ui/icons/ClearSharp';
 import './AdminChat.scss';
+import styled from 'styled-components';
 import useStore from '../../../stores/useStore';
 
+const St = {
+  RoomListWrpper: styled.div`
+    display: flex;
+    flex-direction: column;
+  `,
+  RoomItem: styled.div`
+    padding: 0.75rem 1.25rem;
+
+    width: 100%;
+    height: 3rem;
+    display: flex;
+    justify-content: space-between;
+    background-color: ${(props) => (props.isActive ? '#d0bfff' : '#fff')};
+  `,
+};
 const AdminChat = observer(() => {
-  const [isAdmin, setIsAdmin] = useState(false)
-  const [adminId, setAdminId] = useState('')
+  console.log('adminChat');
+  const [isAdmin, setIsAdmin] = useState(true);
+  const [adminId, setAdminId] = useState('admin');
+
   const { chatStore } = useStore();
+  const messagesRef = useRef(null); // 메시지 엘리먼트를 저장
   let searchResult = [];
   const state = useLocalObservable(() => ({
     name: '',
     password: '',
     chatMsg: '',
     temp: [],
+    messageList: '',
     //인풋 박스 핸들링
     handleChatMessage(e) {
       this.chatMsg = e.target.value;
@@ -34,15 +52,71 @@ const AdminChat = observer(() => {
       document.getElementById('inputMessage').value = '';
       this.name = '';
     },
+    renderChatMessage() {
+      const { chatMessageMap, selectRoomId } = chatStore;
+      let chatMessageList = [];
+      if (!_.isNil(chatMessageMap.get(selectRoomId))) {
+        chatMessageList = chatMessageMap.get(selectRoomId);
+      }
+      let chatMessage = chatMessageList.map((item, i) => {
+        let messageClassName;
+        if (item.system) {
+          messageClassName = 'system-message';
+        } else {
+          if (item.isMe) {
+            messageClassName = 'myMessage';
+          } else if (!item.isMe) {
+            messageClassName = 'anotherUserMessage';
+          }
+        }
+        return !item.isMe ? (
+          <ChatItem
+            userName={item.userName}
+            message={item.message}
+            key={i + '_' + item.message}
+          />
+        ) : (
+          <div className={messageClassName} key={i + '_' + item.message}>
+            {item.userName + ': ' + item.message}
+          </div>
+        );
+      });
+      console.log('chatMessage', chatMessage);
+      this.messageList = chatMessage;
+    },
   }));
+  /*
+      useEffect can be used to set up side effects that need to happen, 
+      and which are bound to the life-cycle of the React component. 
+      Using useEffect requires specifying dependencies. 
+      With MobX that isn't really needed, 
+      since MobX has already a way to automatically determine the dependencies of an effect, autorun. 
+      Combining autorun and coupling it to the life-cycle of the component 
+      using useEffect is luckily straightforward:
+
+  */
+  useEffect(
+    () =>
+      autorun(() => {
+        console.log('autorun hello');
+        state.renderChatMessage();
+      }),
+    [],
+  );
 
   useEffect(() => {
+    if (messagesRef.current) {
+      messagesRef.current.scrollTop = messagesRef.current.scrollHeight;
+    }
+  }, [state.messageList]);
+
+  useEffect(() => {
+    console.log('use EFFECT');
     if (isAdmin) {
       chatStore.setSocketConnection(adminId);
       chatStore.getChatRoomList();
     }
   }, [isAdmin]);
-
   const handleSearch = () => {};
   //   handleSearch = (e) => {
   //     console.log('handleSearch##');
@@ -83,24 +157,29 @@ const AdminChat = observer(() => {
   //     }
   //   };
 
-  function hanldeJoinChatRoom(e) {
-    chatStore.joinChatRoom(e);
+  function handleJoinChatRoom(roomid) {
+    chatStore.joinChatRoom(roomid);
   }
   function createListItem() {
-    const { selectRoomId } = chatStore;
-    const list = chatStore.getRoomNameList;
-    console.log('[SEOYEON] list ', list, selectRoomId);
+    const { selectRoomId, getRoomNameList } = chatStore;
+    console.log('[SEOYEON] selectRoomId', selectRoomId);
+    const list = getRoomNameList;
     return list.map((item, i) => {
       return (
-        <ListGroupItem
-          className={selectRoomId === item ? 'active' : 'unactive'}
+        <St.RoomItem
+          isActive={selectRoomId === item.roomId ? true : false}
           tag="button"
-          onClick={(e) => hanldeJoinChatRoom(e)}
+          onClick={() => handleJoinChatRoom(item.roomId)}
           key={i}
-          name={item}
+          name={item.roomId}
         >
-          {item}
-        </ListGroupItem>
+          <span>{item.roomId}</span>
+          {item.allMessageCount - item.readCount !== 0 && (
+            <span style={{ color: 'red', borderRadius: '4px' }}>
+              {item.allMessageCount - item.readCount}
+            </span>
+          )}
+        </St.RoomItem>
       );
     });
   }
@@ -115,13 +194,13 @@ const AdminChat = observer(() => {
       let messageClassName;
       if (item.system) {
         messageClassName = 'system-message';
-      } else {
-        if (item.isMe) {
-          messageClassName = 'myMessage';
-        } else if (!item.isMe) {
-          messageClassName = 'anotherUserMessage';
-        }
       }
+      if (item.isMe) {
+        messageClassName = 'myMessage';
+      } else if (!item.isMe) {
+        messageClassName = 'anotherUserMessage';
+      }
+
       return !item.isMe ? (
         <ChatItem
           userName={item.userName}
@@ -148,78 +227,84 @@ const AdminChat = observer(() => {
     return (
       <div>
         <button onClick={() => setIsAdmin(true)}>이건 admin만들기 버튼</button>
-        <input type='text' placeholder='admin id' onChange={(e) => {setAdminId(e.target.value)}}></input>
+        <input
+          type="text"
+          placeholder="admin id"
+          onChange={(e) => {
+            setAdminId(e.target.value);
+          }}
+        ></input>
       </div>
-    )
+    );
   }
+  function makeAdminPage() {}
 
-  function makeAdminPage() {
-    return (
-      <Fragment>
-      <button onClick={handleGetChatRoomList}>getChatRoomList</button>
-      <button onClick={handleDeleteRedisKey}>deleteRedisKey</button>
-      <div className={'roomList'}>
-        <form className={'searchBox'} onSubmit={handleSearch}>
-          <SearchOutlinedIcon />
-          <TextField
-            id="input-with-icon-textfield"
-            placeholder="Search Contacts"
-            // onChange={this.handleSearchKeyword}
-            // onKeyDown={this.handleSearchCancel}
-            fullWidth={true}
-          />
-          <ClearSharpIcon onClick={removeSearchResult} />
-        </form>
-        <ListGroup>{searchResult}</ListGroup>
-        <ListGroup>{createListItem()}</ListGroup>
-      </div>
-      <div className="chatRoom">
-        <div className="message">{RenderChatMessage()}</div>
-        <div className="inputBox">
-          <form
-            onSubmit={state.chatMessageSendServer}
-            style={{ width: '100%' }}
-          >
-            <TextField
-              id="inputMessage"
-              //label="메세지를 입력해주세요"
-              //className={classes.textField}
-              type="text"
-              name="inputMessage"
-              onChange={state.handleChatMessage}
-              placeholder="message"
-            />
-            <input
-              id="send-message"
-              type="submit"
-              style={{ display: 'none' }}
-            />
-            <label
-              htmlFor="send-message"
-              type="submit"
-              style={{ margin: '0px' }}
-            >
-              <Button
-                variant="contained"
-                color="primary"
-                onClick={state.chatMessageSendServer}
-                size={'small'}
-              >
-                Send
-                <Icon>send</Icon>
-              </Button>
-            </label>
-          </form>
-        </div>
-      </div>
-      </Fragment>
-    )
-  }
   return (
     <div className="chatRooWrapper" height="100%">
-      {isAdmin ? makeAdminPage() : makeAdminPageButton()}
+      {/*isAdmin ? makeAdminPage() : makeAdminPageButton()*/}
+
+      <Fragment>
+        <button onClick={handleGetChatRoomList}>getChatRoomList</button>
+        <button onClick={handleDeleteRedisKey}>deleteRedisKey</button>
+        <div className="roomList">
+          <form className={'searchBox'} onSubmit={handleSearch}>
+            <SearchOutlinedIcon />
+            <TextField
+              id="input-with-icon-textfield"
+              placeholder="Search Contacts"
+              // onChange={this.handleSearchKeyword}
+              // onKeyDown={this.handleSearchCancel}
+              fullWidth={true}
+            />
+            <ClearSharpIcon onClick={removeSearchResult} />
+          </form>
+          <div>{searchResult}</div>
+          <St.RoomListWrpper>{createListItem()}</St.RoomListWrpper>
+        </div>
+        <div className="chatRoom">
+          <div className="message" ref={messagesRef}>
+            {state.messageList}
+          </div>
+          <div className="inputBox">
+            <form
+              onSubmit={state.chatMessageSendServer}
+              style={{ width: '100%' }}
+            >
+              <TextField
+                id="inputMessage"
+                //label="메세지를 입력해주세요"
+                //className={classes.textField}
+                type="text"
+                name="inputMessage"
+                onChange={state.handleChatMessage}
+                placeholder="message"
+              />
+              <input
+                id="send-message"
+                type="submit"
+                style={{ display: 'none' }}
+              />
+              <label
+                htmlFor="send-message"
+                type="submit"
+                style={{ margin: '0px' }}
+              >
+                <Button
+                  variant="contained"
+                  color="primary"
+                  onClick={state.chatMessageSendServer}
+                  size={'small'}
+                >
+                  Send
+                  <Icon>send</Icon>
+                </Button>
+              </label>
+            </form>
+          </div>
+        </div>
+      </Fragment>
     </div>
   );
 });
 
-export default AdminChat;
+export default React.memo(AdminChat);

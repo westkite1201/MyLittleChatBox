@@ -1,30 +1,76 @@
 const _ = require('lodash');
 const userRedis = require('../model/redis/redisDao');
-const REDIS = require('../model/redis/redis');
-
+const helpers = require('../lib/helpers');
 const ADMIN_IN_ROOM_MSG = 'ADMIN님이 방에 입장하였습니다.';
 const ADMIN_LEAVE_ROOM_MSG = 'ADMIN님이 방에서 나갔습니다. ';
 let roomId = '';
 let socketId = '';
+var admins = [];
+let chatSocket;
+function adminUpdate() {
+  admins.forEach(function (value, index, ar) {
+    admins[index].emit('update', { message: 'update' });
+  });
+}
 const connection = (io) => {
   const namespaceChat = io.of('/chat');
+  //test
+  const namespaceChatAdmin = io.of('/admin');
+  namespaceChatAdmin.on('connection', function (socket) {
+    admins.push(socket);
+    console.log(
+      ' namespaceChatAdmin socket connection complete , Socket id =>',
+      socket.id,
+    );
+    socket.on('update', (data) => {});
+  });
+
   namespaceChat.on('connection', function (socket) {
-    console.log('socket connection ');
+    console.log('socket connection complete , Socket id =>', socket.id);
     socket.on('deleteRedisKey', () => {
       userRedis.deleteRedisKey();
     });
     //방 가져오기
     socket.on('getChatRoomList', async (data) => {
-      console.log('data', data);
-      console.log("'[SEO] getChatRoomList", roomId);
-      let roomList = await userRedis.getChatRoomList(data);
-      console.log('[SEO] ROOMLIST ', roomList);
-      // socket.to(roomId).emit('getChatRoomList', roomList)
-      socket.join(roomId);
-      console.log(socket.rooms);
-      socket.emit('getChatRoomList', roomList);
-      //socket.to(roomId).emit('getChatRoomList',  roomList)
-      //socket.emit('getChatRoomList', roomList)
+      console.log('[SEO] getChatRoomList data', data);
+      console.log('[SEO] getChatRoomList roomId', roomId);
+      try {
+        let roomList = await userRedis.getChatRoomList(data);
+        let messageInfo = data.messageInfo;
+        //해당 방에 총 몇개가 쌓여있는지
+        //한번메세지가 올떄마다 이루틴을 반복해야한다는게
+        //오버헤드가 클꺼같음.;
+        let roomsData = await roomList.reduce(async (promise, cur) => {
+          let result = await promise.then(); // 누산기 프로미스 풀고 설정
+          //누산값 재정리
+          let value = await userRedis.getChatMessageCount(
+            messageInfo.socketId,
+            cur,
+          );
+          let allandReadCountInfo = value.split(':');
+          let res = {
+            roomId: cur,
+            allMessageCount: allandReadCountInfo[0],
+            readCount: allandReadCountInfo[1],
+          };
+          result.push(res);
+          //리턴
+          return Promise.resolve(result);
+        }, Promise.resolve([])); //프로미스 초기값 선언
+
+        console.log('roomsData =>', helpers.returnStatusCode(roomsData));
+        socket.join(roomId); // ADMIN 방에 입장후
+        socket.emit(
+          'getChatRoomList',
+          helpers.returnStatusCode(true, roomsData),
+        );
+      } catch (e) {
+        socket.join(roomId); // ADMIN 방에 입장후
+        socket.emit(
+          'getChatRoomList',
+          helpers.returnStatusCode(false, roomsData, e),
+        );
+      }
     });
     /* message INFO 넣ㄱ ㅣ */
     //방 들어가기
@@ -34,7 +80,7 @@ const connection = (io) => {
       const { roomId } = messageInfo;
 
       userRedis.joinChatRoom(data);
-      userRedis.addMessage(messageInfo);
+      //userRedis.addMessage(messageInfo);
       socket.join(roomId); //socketJoin
       socket.emit('joinChatRoom', { message: socket.rooms });
       /* 시스템 메세지  */
@@ -54,10 +100,9 @@ const connection = (io) => {
         roomId: roomId,
         message: ADMIN_LEAVE_ROOM_MSG,
       });
-
       socket.leave(roomId); //socketLeave
       console.log(socket.rooms);
-      userRedis.addMessage(messageInfo);
+      //userRedis.addMessage(messageInfo);
       userRedis.leaveChatRoom(messageInfo);
     });
 
@@ -89,6 +134,8 @@ const connection = (io) => {
       userRedis.addMessage(messageInfo);
       socket.join(messageInfo.roomId);
       socket.to(messageInfo.roomId).emit('sendChatMessage', messageInfo);
+
+      adminUpdate();
     });
 
     //방 메세지 가져오기
@@ -115,8 +162,9 @@ const connection = (io) => {
         return messageInfo;
       });
 
-      console.log('[SEO] getChatMessage messageList', messageList);
+      //console.log('[SEO] getChatMessage messageList', messageList);
       socket.join(messageInfo.roomId);
+      adminUpdate();
       //socket.to(messageInfo.roomId).emit('getChatMessage', { messageList : messageList })
       namespaceChat
         .to(messageInfo.roomId)

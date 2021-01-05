@@ -45,29 +45,30 @@ const deleteRedisKey = () => {
 //key, SOCKETID : ROOM_ID
 //VALUE : INDEXNUM
 const setReadIndex = async (messageInfo) => {
-  let message = messageInfo.message;
+  //let message = messageInfo.message;
   let roomId = messageInfo.roomId;
   let socketId = messageInfo.socketId;
-  let userId = messageInfo.userId;
-  let userName = messageInfo.userName;
+  // let userId = messageInfo.userId;
+  // let userName = messageInfo.userName;
 
   const lenkey = util.format('%s:%s', KEY_MESSAGE, roomId);
   let indexNum = await redishelpers.redis.llen(lenkey);
-
   const key = util.format('%s:%s:%s', KEY_INDEX, socketId, roomId);
   console.log('[SEO] SET_READ_INDEX ', key, indexNum);
   return redishelpers.redis.set(key, indexNum);
 };
 
-const getReadIndex = () => {
-  let message = messageInfo.message;
+const getReadIndex = async (messageInfo) => {
+  //let message = messageInfo.message;
   let roomId = messageInfo.roomId;
   let socketId = messageInfo.socketId;
-  let userId = messageInfo.userId;
-  let userName = messageInfo.userName;
+  // let userId = messageInfo.userId;
+  // let userName = messageInfo.userName;
 
   const key = util.format('%s:%s:%s', KEY_INDEX, socketId, roomId);
-  return redishelpers.redis.get(key);
+  console.log('getReadIndex => key', key);
+  const readIndex = await redishelpers.redis.get(key);
+  return _.isNil(readIndex) ? 0 : readIndex;
 };
 
 //message add
@@ -98,7 +99,21 @@ const addMessage = (messageInfo) => {
   return redishelpers.redis.rpush(key, value);
 };
 
-//message get
+const getChatMessageCount = async (socketId, targetRoomId) => {
+  const key = util.format('%s:%s', KEY_MESSAGE, targetRoomId);
+  let messageInfo = {
+    roomId: targetRoomId,
+    socketId: socketId,
+  };
+  let roomMessageCount = await redishelpers.redis.llen(key); //현재 방의 메세지 카운트
+  let messageReadIndex = await getReadIndex(messageInfo); //현재 계정의 읽은 메세지 카운트
+  console.log(
+    'roomMessage messageRedindex ',
+    roomMessageCount,
+    messageReadIndex,
+  );
+  return util.format('%s:%s', roomMessageCount, messageReadIndex);
+};
 //message add 에 소켓 아이디가 필요한가.?
 //그러면 조회도 룸아이디로만
 const getChatMessage = async (messageInfo) => {
@@ -133,9 +148,7 @@ const createChatRoom = (data) => {
 const getChatRoomList = async (data) => {
   const key = util.format('%s:%s', KEY_ROOM, 'ADMIN');
   console.log('[SEO][getChatRoomList] KEY ', key);
-  let resdata = await returnStatusCode(redishelpers.redis.smembers(key));
-  console.log('getChatRoomList2 ', resdata);
-
+  let resdata = await redishelpers.redis.smembers(key);
   return resdata;
 };
 
@@ -204,6 +217,7 @@ module.exports = {
   createChatRoom: createChatRoom,
   getChatRoomList: getChatRoomList,
   getChatRoomMember: getChatRoomMember,
+  getChatMessageCount: getChatMessageCount,
   joinChatRoom: joinChatRoom,
   leaveChatRoom: leaveChatRoom,
   distroyRoom: distroyRoom,

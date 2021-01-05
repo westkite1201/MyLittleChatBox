@@ -7,7 +7,7 @@ export const nicknameMaker = () => {
   let secondNameList = ['1', '2', '3', '4'];
   let first = Math.floor(Math.random() * firstNameList.length - 1) + 1;
   let second = Math.floor(Math.random() * firstNameList.length - 1) + 1;
-  return firstNameList[first] + ' ' + secondNameList[second];
+  return firstNameList[first] + '_' + secondNameList[second];
 };
 
 export const makeRoomId = (userInfo) => {

@@ -1,14 +1,18 @@
-import { observable } from 'mobx';
+import { observable, configure } from 'mobx';
 import io from 'socket.io-client';
 import { isEmpty, isNil } from 'lodash';
 import { Cookies } from 'react-cookie';
 import { storeContext } from './Context';
 import { nicknameMaker, makeRoomId } from '../lib/helpers';
+configure({
+  enforceActions: 'never',
+});
 const cookies = new Cookies();
 
 const chatStore = observable({
   socket: '',
   chatSocket: '',
+  adminChatSocket: '',
   socketId: '', //..socketId는 connect 부분 외에 잡히지 않음 따로 변수로 뺴야할듯
   chatMessage: [],
   chatMessageMap: new Map(),
@@ -113,8 +117,8 @@ const chatStore = observable({
     this.chatSocket.emit('getChatRoomList', {
       messageInfo: {
         roomId: roomId,
-        message: 'admin님이 방에서 나갔습니다.',
-        socketId: 'system',
+        message: 'getChatRoomList',
+        socketId: this.chatSocket.id,
         userId: isAdmin ? 'ADMIN' : null, // 있으면 id, 없으면 null
         userName: '', //
       },
@@ -140,13 +144,14 @@ const chatStore = observable({
   },
 
   //admin 입장
-  joinChatRoom(e) {
+  joinChatRoom(roomid) {
     this.leaveChatRoom(this.selectRoomId);
-    if (this.selectRoomId !== e.target.name) {
-      this.selectRoomId = e.target.name;
+    if (this.selectRoomId !== roomid) {
+      this.selectRoomId = roomid;
+      console.log('[SEOYEON] e.targetName', roomid);
       this.chatSocket.emit('joinChatRoom', {
         messageInfo: {
-          roomId: e.target.name,
+          roomId: roomid,
           message: 'admin님이 방에 들어왔습니다', //채팅 메세지
           socketId: 'system', // 소켓 id 로 구분 함
           userId: null, // 있으면 id, 없으면 null
@@ -171,15 +176,30 @@ const chatStore = observable({
   },
 
   //socketConnection
-
   setSocketConnection(inputSocketId) {
+    console.log('TEST', this);
     // console.log('[SEOYEON] setSocketConnection hello ');
     if (isEmpty(this.chatSocket)) {
+      console.log('TEST', this);
       const chatSocket = io('http://localhost:3031/chat');
+      //이 소켓은 admin 일경우 뚫기
+      //로그인 및 권한 설정 추가 필요
+      const adminSocket = io('http://localhost:3031/admin');
+      adminSocket.on('connect', () => {
+        this.adminChatSocket = adminSocket;
+        this.adminChatSocket.on('update', () => {
+          this.getChatRoomList();
+        });
+      });
 
       /* connect 되면 userInfo setting 처리   */
       chatSocket.on('connect', () => {
-        console.log('[SEOYEON] connect ', chatSocket.id, 'SocketId: ', inputSocketId);
+        console.log(
+          '[SEOYEON] connect ',
+          chatSocket.id,
+          'SocketId: ',
+          inputSocketId,
+        );
         this.socketId = inputSocketId; //chatSocket id 세팅
         this.initUserInfo(inputSocketId);
         this.socketConnect = true;
@@ -283,13 +303,14 @@ const chatStore = observable({
         }
         this.selectRoomId = data.roomId;
       });
+
       /* 방 생성  */
       this.chatSocket.on('createChatRoom', (data) => {
         console.log('[SEOYEON][createChatRoom] -> server Response ', data);
       });
+
       /* 방 리스트 가져오기  */
       this.chatSocket.on('getChatRoomList', (resData) => {
-        // console.log('[SEO][getChatRoomList] -> server Response', resData);
         if (resData.statusCode === 200) {
           this.roomNameList = resData.data;
         }
@@ -354,7 +375,7 @@ const chatStore = observable({
       userName: userInfo.userName, //
       //isMe : true // sendMessage 는 무조건 나
     };
-    // console.log('[SEO] getChatMessage client -> server ', chatMessage);
+    console.log('[SEO] getChatMessage client -> server ', chatMessage);
     this.chatSocket.emit('getChatMessage', chatMessage);
   },
 });
