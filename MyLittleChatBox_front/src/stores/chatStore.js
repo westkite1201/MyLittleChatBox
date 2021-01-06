@@ -45,15 +45,13 @@ const chatStore = observable({
   get postLength() {
     return this.data.length;
   },
-  initUserInfo(socketId, userId) {
+  initUserInfo(socketId, userId = 'ADMIN') {
     // console.log('[SEO][InitUserInfo] socketId = ', socketId);
-
     let userInfo = {
       socketId: socketId,
-      userId: userId + '_0',
+      userId: userId,
       userName: nicknameMaker(),
     };
-
     /* 기존 소켓 id가 있다면  */
     /* setting Socket  */
     // Expires Example
@@ -82,19 +80,16 @@ const chatStore = observable({
     //   };
     // } else {
     //없다면 setting
-    cookies.set('socketId', socketId, { expires: tomorrow });
-    cookies.set('userId', userInfo.userId, { expires: tomorrow });
-    cookies.set('userName', userInfo.userName, { expires: tomorrow });
+    // cookies.set('socketId', socketId, { expires: tomorrow });
+    // cookies.set('userId', userInfo.userId, { expires: tomorrow });
+    // cookies.set('userName', userInfo.userName, { expires: tomorrow });
     // }
-    // console.log('[SEO][ COOKIE ] ', cookies.get('socketId'));
-    // console.log('[SEOYEON] userInfo 1', userInfo);
     this.userInfo = userInfo;
-    // console.log('[SEOYEON] userInfo 2', this.userInfo);
   },
   //client 방 만들기
   createChatRoom() {
     const { userInfo, socketId } = this;
-    let roomId = userInfo.userName + '_' + userInfo.socketId;
+    let roomId = makeRoomId(userInfo);
     // console.log('[SEOYEON] roomid ', roomId);
     let messageInfo = {
       message: 'createChatRoom', //채팅 메세지
@@ -112,8 +107,8 @@ const chatStore = observable({
   },
 
   getChatRoomList(isAdmin) {
-    const { userInfo, socketId } = this;
-    let roomId = userInfo.userName + '_' + userInfo.socketId;
+    const { userInfo } = this;
+    let roomId = makeRoomId(userInfo);
     this.chatSocket.emit('getChatRoomList', {
       messageInfo: {
         roomId: roomId,
@@ -292,6 +287,7 @@ const chatStore = observable({
       /* 방 리스트 가져오기  */
       this.chatSocket.on('getChatRoomList', (resData) => {
         if (resData.statusCode === 200) {
+          console.log('getChatRoomList ', resData.data);
           this.roomNameList = resData.data;
         }
       });

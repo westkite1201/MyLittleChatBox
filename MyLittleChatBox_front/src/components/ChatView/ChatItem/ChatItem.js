@@ -29,7 +29,7 @@ const St = {
 // }
 const ChatItem = ({ item }) => {
   const { message, userName, isMe } = item;
-  console.log('ITEM ', item);
+  //console.log('ITEM ', item);
   return (
     <St.ChatItemWrapper isMe={isMe}>
       {!isMe && userName}

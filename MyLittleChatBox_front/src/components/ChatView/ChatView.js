@@ -19,7 +19,7 @@ const ChatView = observer(() => {
   useEffect(() => {
     if (makeRoom) {
       chatStore.setSocketConnection(clientId);
-      chatStore.initUserInfo();
+      //chatStore.initUserInfo();
     }
   }, [makeRoom]);
 
