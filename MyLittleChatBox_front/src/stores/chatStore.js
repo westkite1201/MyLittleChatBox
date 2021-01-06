@@ -45,12 +45,12 @@ const chatStore = observable({
   get postLength() {
     return this.data.length;
   },
-  initUserInfo(socketId) {
+  initUserInfo(socketId, userId) {
     // console.log('[SEO][InitUserInfo] socketId = ', socketId);
 
     let userInfo = {
       socketId: socketId,
-      userId: socketId + '_0',
+      userId: userId + '_0',
       userName: nicknameMaker(),
     };
 
@@ -148,7 +148,6 @@ const chatStore = observable({
     this.leaveChatRoom(this.selectRoomId);
     if (this.selectRoomId !== roomid) {
       this.selectRoomId = roomid;
-      console.log('[SEOYEON] e.targetName', roomid);
       this.chatSocket.emit('joinChatRoom', {
         messageInfo: {
           roomId: roomid,
@@ -176,32 +175,25 @@ const chatStore = observable({
   },
 
   //socketConnection
-  setSocketConnection(inputSocketId) {
-    console.log('TEST', this);
-    // console.log('[SEOYEON] setSocketConnection hello ');
+  setSocketConnection(inputUserId, isAdmin) {
     if (isEmpty(this.chatSocket)) {
-      console.log('TEST', this);
       const chatSocket = io('http://localhost:3031/chat');
       //이 소켓은 admin 일경우 뚫기
       //로그인 및 권한 설정 추가 필요
-      const adminSocket = io('http://localhost:3031/admin');
-      adminSocket.on('connect', () => {
-        this.adminChatSocket = adminSocket;
-        this.adminChatSocket.on('update', () => {
-          this.getChatRoomList();
+      if (isAdmin) {
+        const adminSocket = io('http://localhost:3031/admin');
+        adminSocket.on('connect', () => {
+          this.adminChatSocket = adminSocket;
+          this.adminChatSocket.on('update', () => {
+            this.getChatRoomList();
+          });
         });
-      });
+      }
 
       /* connect 되면 userInfo setting 처리   */
       chatSocket.on('connect', () => {
-        console.log(
-          '[SEOYEON] connect ',
-          chatSocket.id,
-          'SocketId: ',
-          inputSocketId,
-        );
-        this.socketId = inputSocketId; //chatSocket id 세팅
-        this.initUserInfo(inputSocketId);
+        this.socketId = chatSocket.id; //chatSocket id 세팅
+        this.initUserInfo(chatSocket.id, inputUserId);
         this.socketConnect = true;
         this.createChatRoom();
       });
@@ -216,16 +208,6 @@ const chatStore = observable({
         // console.log('[SEO] joinChatRoom -> server Response', data.message);
       });
 
-      /* redis connect 
-            초기세팅시 이 함수를 통해서 데이터를 로컬에 세팅 함 
-            들어갔을때 이 함수를 통해서 message를 가져와야함 
-  
-            - 문제  발견 현재 redis 는 그냥 데이터만 들어감 스트링 값만
-              근데 이 스트링 값은 밑에 chatMessage 처럼 데이터가 없음
-              그래서 누가 보낸건지 모름 
-              데이터 저장할때 roomId, socketId,message 를 구분자 줘서 어케 처리해야할듯?
-         */
-
       this.chatSocket.on('getChatMessage', (data) => {
         // console.log('[SEOYEON] getChatMessage -> server Response', data);
         const { chatMessageMap } = this;
@@ -236,9 +218,7 @@ const chatStore = observable({
           //아무것도없으면 할일없음
           return;
         }
-
         let selectRoomId = messageList[0].roomId;
-
         messageList = messageList.map((item) => {
           let isMe = false;
           if (socketId === item.socketId) {
@@ -375,7 +355,6 @@ const chatStore = observable({
       userName: userInfo.userName, //
       //isMe : true // sendMessage 는 무조건 나
     };
-    console.log('[SEO] getChatMessage client -> server ', chatMessage);
     this.chatSocket.emit('getChatMessage', chatMessage);
   },
 });

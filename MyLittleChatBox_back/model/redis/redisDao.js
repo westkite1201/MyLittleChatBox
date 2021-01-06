@@ -141,7 +141,10 @@ const createChatRoom = (data) => {
   //const key = util.format('%s:%s', KEY_ROOM, data.messageInfo.roomId);
   console.log('[SEO][createChatRoom] KEY ', key);
   return returnStatusCode(
-    redishelpers.redis.sadd(key, data.messageInfo.roomId),
+    redishelpers.redis.sadd(
+      key,
+      data.messageInfo.roomId + ':' + data.messageInfo.userId,
+    ),
   ); // roomList를 위해
 };
 

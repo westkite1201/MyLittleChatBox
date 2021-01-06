@@ -57,32 +57,13 @@ const AdminChat = observer(() => {
       let chatMessageList = [];
       if (!_.isNil(chatMessageMap.get(selectRoomId))) {
         chatMessageList = chatMessageMap.get(selectRoomId);
+        let chatMessage = chatMessageList.map((item, i) => {
+          return <ChatItem item={item} key={i + '_' + item.message} />;
+        });
+        console.log('chatMessage', chatMessage);
+
+        this.messageList = chatMessage;
       }
-      let chatMessage = chatMessageList.map((item, i) => {
-        let messageClassName;
-        if (item.system) {
-          messageClassName = 'system-message';
-        } else {
-          if (item.isMe) {
-            messageClassName = 'myMessage';
-          } else if (!item.isMe) {
-            messageClassName = 'anotherUserMessage';
-          }
-        }
-        return !item.isMe ? (
-          <ChatItem
-            userName={item.userName}
-            message={item.message}
-            key={i + '_' + item.message}
-          />
-        ) : (
-          <div className={messageClassName} key={i + '_' + item.message}>
-            {item.userName + ': ' + item.message}
-          </div>
-        );
-      });
-      console.log('chatMessage', chatMessage);
-      this.messageList = chatMessage;
     },
   }));
   /*
@@ -98,7 +79,6 @@ const AdminChat = observer(() => {
   useEffect(
     () =>
       autorun(() => {
-        console.log('autorun hello');
         state.renderChatMessage();
       }),
     [],
@@ -111,9 +91,8 @@ const AdminChat = observer(() => {
   }, [state.messageList]);
 
   useEffect(() => {
-    console.log('use EFFECT');
     if (isAdmin) {
-      chatStore.setSocketConnection(adminId);
+      chatStore.setSocketConnection(adminId, true);
       chatStore.getChatRoomList();
     }
   }, [isAdmin]);
@@ -162,7 +141,6 @@ const AdminChat = observer(() => {
   }
   function createListItem() {
     const { selectRoomId, getRoomNameList } = chatStore;
-    console.log('[SEOYEON] selectRoomId', selectRoomId);
     const list = getRoomNameList;
     return list.map((item, i) => {
       return (
@@ -173,7 +151,7 @@ const AdminChat = observer(() => {
           key={i}
           name={item.roomId}
         >
-          <span>{item.roomId}</span>
+          <span>{item.userId}</span>
           {item.allMessageCount - item.readCount !== 0 && (
             <span style={{ color: 'red', borderRadius: '4px' }}>
               {item.allMessageCount - item.readCount}
@@ -184,37 +162,6 @@ const AdminChat = observer(() => {
     });
   }
 
-  function RenderChatMessage() {
-    const { chatMessageMap, selectRoomId } = chatStore;
-    let chatMessageList = [];
-    if (!_.isNil(chatMessageMap.get(selectRoomId))) {
-      chatMessageList = chatMessageMap.get(selectRoomId);
-    }
-    let chatMessage = chatMessageList.map((item, i) => {
-      let messageClassName;
-      if (item.system) {
-        messageClassName = 'system-message';
-      }
-      if (item.isMe) {
-        messageClassName = 'myMessage';
-      } else if (!item.isMe) {
-        messageClassName = 'anotherUserMessage';
-      }
-
-      return !item.isMe ? (
-        <ChatItem
-          userName={item.userName}
-          message={item.message}
-          key={i + '_' + item.message}
-        />
-      ) : (
-        <div className={messageClassName} key={i + '_' + item.message}>
-          {item.userName + ': ' + item.message}
-        </div>
-      );
-    });
-    return chatMessage;
-  }
   function handleGetChatRoomList() {
     let isAdmin = true;
     chatStore.getChatRoomList(isAdmin);

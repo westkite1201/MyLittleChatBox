@@ -1,10 +1,4 @@
-import React, {
-  useEffect,
-  useState,
-  Fragment,
-  useRef,
-  useCallback,
-} from 'react';
+import React, { useEffect, useState, Fragment, useRef } from 'react';
 //import UseStores from "../../lib/UseStores";
 import { observer, useLocalObservable } from 'mobx-react';
 import { autorun } from 'mobx';
@@ -25,8 +19,8 @@ const ChatView = observer(() => {
   useEffect(() => {
     if (makeRoom) {
       chatStore.setSocketConnection(clientId);
+      chatStore.initUserInfo();
     }
-    //chatStore.initUserInfo();
   }, [makeRoom]);
 
   const state = useLocalObservable(() => ({
@@ -39,7 +33,6 @@ const ChatView = observer(() => {
     },
     chatMessageSendServer(e) {
       e.preventDefault();
-      console.log('chatMessageSendServer!!');
       chatStore.sendChatMessage(this.chatMsg, 'test');
       document.getElementById('inputMessage').value = '';
       this.name = '';
@@ -52,27 +45,7 @@ const ChatView = observer(() => {
         chatMessageList = chatMessageMap.get(selectRoomId);
       }
       let chatMessage = chatMessageList.map((item, i) => {
-        let messageClassName;
-        if (item.system) {
-          messageClassName = 'system-message';
-        } else {
-          if (item.isMe) {
-            messageClassName = 'myMessage';
-          } else if (!item.isMe) {
-            messageClassName = 'anotherUserMessage';
-          }
-        }
-        return !item.isMe ? (
-          <ChatItem
-            userName={item.userName}
-            message={item.message}
-            key={i + '_' + item.message}
-          />
-        ) : (
-          <div className={messageClassName} key={i + '_' + item.message}>
-            {item.userName + ': ' + item.message}
-          </div>
-        );
+        return <ChatItem item={item} key={i + '_' + item.message} />;
       });
       this.messageList = chatMessage;
     },
