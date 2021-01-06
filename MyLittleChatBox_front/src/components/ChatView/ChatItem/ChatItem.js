@@ -12,9 +12,10 @@ const St = {
     padding: 0.75rem 1.25rem;
     display: flex;
     justify-content: space-between;
-    background-color: ${(props) => (props.isMe ? '#d0bfff' : '#fff')};
+    background-color: ${(props) => (props.isMe ? '#ff6b6b' : '#fff')};
     max-width: 50%;
     word-break: break-all;
+    color: ${(props) => (props.isMe ? '#fff' : 'black')};
   `,
 };
 

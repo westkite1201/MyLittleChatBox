@@ -24,7 +24,22 @@ const St = {
     height: 3rem;
     display: flex;
     justify-content: space-between;
-    background-color: ${(props) => (props.isActive ? '#d0bfff' : '#fff')};
+    background-color: ${(props) => (props.isActive ? '#ff8787' : '#fff')};
+    color: ${(props) => (props.isActive ? '#fff' : 'black')};
+    &:hover {
+      background-color: #ffec99;
+      color: black;
+    }
+  `,
+  Badge: styled.div`
+    width: 1.5rem;
+    height: 1.5rem;
+    border-radius: 5px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 3px;
+    background: red;
   `,
 };
 const AdminChat = observer(() => {
@@ -153,9 +168,11 @@ const AdminChat = observer(() => {
         >
           <span>{item.userId}</span>
           {item.allMessageCount - item.readCount !== 0 && (
-            <span style={{ color: 'red', borderRadius: '4px' }}>
-              {item.allMessageCount - item.readCount}
-            </span>
+            <St.Badge style={{ display: 'flex', justifyContent: 'center' }}>
+              <span style={{ color: 'white', fontStyle: 'bold' }}>
+                {item.allMessageCount - item.readCount}
+              </span>
+            </St.Badge>
           )}
         </St.RoomItem>
       );
@@ -186,11 +203,11 @@ const AdminChat = observer(() => {
   function makeAdminPage() {
     return (
       <Fragment>
-        <button onClick={handleGetChatRoomList}>getChatRoomList</button>
-        <button onClick={handleDeleteRedisKey}>deleteRedisKey</button>
         <div className="roomList">
+          {/*}
           <form className={'searchBox'} onSubmit={handleSearch}>
             <SearchOutlinedIcon />
+
             <TextField
               id="input-with-icon-textfield"
               placeholder="Search Contacts"
@@ -200,6 +217,12 @@ const AdminChat = observer(() => {
             />
             <ClearSharpIcon onClick={removeSearchResult} />
           </form>
+    */}
+          <div className="searchBox">
+            <button onClick={handleGetChatRoomList}>getChatRoomList</button>
+            <button onClick={handleDeleteRedisKey}>deleteRedisKey</button>
+          </div>
+
           <div>{searchResult}</div>
           <St.RoomListWrpper>{createListItem()}</St.RoomListWrpper>
         </div>
@@ -219,7 +242,7 @@ const AdminChat = observer(() => {
                 type="text"
                 name="inputMessage"
                 onChange={state.handleChatMessage}
-                placeholder="message"
+                placeholder="하시고 싶은말을 입력하세요!"
               />
               <input
                 id="send-message"
