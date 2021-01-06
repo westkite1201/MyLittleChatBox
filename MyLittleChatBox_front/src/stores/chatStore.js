@@ -190,7 +190,9 @@ const chatStore = observable({
         this.socketId = chatSocket.id; //chatSocket id 세팅
         this.initUserInfo(chatSocket.id, inputUserId);
         this.socketConnect = true;
-        this.createChatRoom();
+        if (!isAdmin) {
+          this.createChatRoom();
+        }
       });
       chatSocket.on('disconnect', function () {
         // console.log('[SEOYEON] disconnect client event....');
