@@ -245,14 +245,12 @@ const AdminChat = observer(() => {
           </div>
         </div>
       </Fragment>
-    )
+    );
   }
 
   return (
     <div className="chatRooWrapper" height="100%">
       {isAdmin ? makeAdminPage() : makeAdminPageButton()}
-
-      
     </div>
   );
 });

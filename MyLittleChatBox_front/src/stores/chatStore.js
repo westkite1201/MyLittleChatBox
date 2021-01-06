@@ -243,7 +243,7 @@ const chatStore = observable({
           // console.log('[SEO] chatMessageMap has not');
           chatMessageMap.set(selectRoomId, messageList);
         }
-        this.selectRoomId = selectRoomId;
+        //this.selectRoomId = selectRoomId;
       });
 
       /* message chat  */
@@ -278,7 +278,7 @@ const chatStore = observable({
           //처음 세팅
           chatMessageMap.set(data.roomId, [chatMessage]);
         }
-        this.selectRoomId = data.roomId;
+        //this.selectRoomId = data.roomId;
       });
 
       /* 방 생성  */
