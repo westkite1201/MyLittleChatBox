@@ -142,7 +142,7 @@ const createChatRoom = (data) => {
 };
 
 const getChatRoomList = async (data) => {
-  const key = util.format('%s:%s', KEY_ROOM, 'ADMIN');
+  const key = util.format('%s:%s', KEY_ROOM, data.messageInfo.userId);
   console.log('[SEO][getChatRoomList] KEY ', key);
   let resdata = await redishelpers.redis.smembers(key);
   return resdata;

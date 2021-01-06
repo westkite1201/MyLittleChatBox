@@ -29,7 +29,7 @@ const St = {
 };
 const AdminChat = observer(() => {
   console.log('adminChat');
-  const [isAdmin, setIsAdmin] = useState(true);
+  const [isAdmin, setIsAdmin] = useState(false);
   const [adminId, setAdminId] = useState('admin');
 
   const { chatStore } = useStore();
@@ -93,7 +93,7 @@ const AdminChat = observer(() => {
   useEffect(() => {
     if (isAdmin) {
       chatStore.setSocketConnection(adminId, true);
-      chatStore.getChatRoomList();
+      chatStore.getChatRoomList(adminId);
     }
   }, [isAdmin]);
   const handleSearch = () => {};
@@ -163,8 +163,7 @@ const AdminChat = observer(() => {
   }
 
   function handleGetChatRoomList() {
-    let isAdmin = true;
-    chatStore.getChatRoomList(isAdmin);
+    chatStore.getChatRoomList(adminId);
   }
   function handleDeleteRedisKey() {
     chatStore.deleteRedisKey();
@@ -184,12 +183,8 @@ const AdminChat = observer(() => {
       </div>
     );
   }
-  function makeAdminPage() {}
-
-  return (
-    <div className="chatRooWrapper" height="100%">
-      {/*isAdmin ? makeAdminPage() : makeAdminPageButton()*/}
-
+  function makeAdminPage() {
+    return (
       <Fragment>
         <button onClick={handleGetChatRoomList}>getChatRoomList</button>
         <button onClick={handleDeleteRedisKey}>deleteRedisKey</button>
@@ -250,6 +245,14 @@ const AdminChat = observer(() => {
           </div>
         </div>
       </Fragment>
+    )
+  }
+
+  return (
+    <div className="chatRooWrapper" height="100%">
+      {isAdmin ? makeAdminPage() : makeAdminPageButton()}
+
+      
     </div>
   );
 });
