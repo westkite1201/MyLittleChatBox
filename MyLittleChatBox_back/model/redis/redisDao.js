@@ -105,13 +105,14 @@ const getChatMessageCount = async (socketId, targetRoomId) => {
     roomId: targetRoomId,
     socketId: socketId,
   };
+  console.log('getChatMessageCount  ', key);
   let roomMessageCount = await redishelpers.redis.llen(key); //현재 방의 메세지 카운트
   let messageReadIndex = await getReadIndex(messageInfo); //현재 계정의 읽은 메세지 카운트
-  // console.log(
-  //   'roomMessage messageRedindex ',
-  //   roomMessageCount,
-  //   messageReadIndex,
-  // );
+  console.log(
+    'roomMessage messageRedindex ',
+    roomMessageCount,
+    messageReadIndex,
+  );
   return util.format('%s:%s', roomMessageCount, messageReadIndex);
 };
 //message add 에 소켓 아이디가 필요한가.?
@@ -142,7 +143,7 @@ const createChatRoom = (data) => {
 };
 
 const getChatRoomList = async (data) => {
-  const key = util.format('%s:%s', KEY_ROOM, data.messageInfo.userId);
+  const key = util.format('%s:%s', KEY_ROOM, 'ADMIN');
   console.log('[SEO][getChatRoomList] KEY ', key);
   let resdata = await redishelpers.redis.smembers(key);
   return resdata;

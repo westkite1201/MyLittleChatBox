@@ -33,7 +33,7 @@ const ChatView = observer(() => {
     },
     chatMessageSendServer(e) {
       e.preventDefault();
-      chatStore.sendChatMessage(this.chatMsg, 'test');
+      chatStore.sendChatMessage(this.chatMsg);
       document.getElementById('inputMessage').value = '';
       this.name = '';
       this.chatMsg = '';

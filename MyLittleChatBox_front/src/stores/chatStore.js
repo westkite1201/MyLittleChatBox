@@ -46,7 +46,7 @@ const chatStore = observable({
     return this.data.length;
   },
   initUserInfo(socketId, userId = 'ADMIN') {
-    // console.log('[SEO][InitUserInfo] socketId = ', socketId);
+    console.log('[SEO][InitUserInfo] socketId = ', socketId, userId);
     let userInfo = {
       socketId: socketId,
       userId: userId,
@@ -90,6 +90,7 @@ const chatStore = observable({
   createChatRoom() {
     const { userInfo, socketId } = this;
     let roomId = makeRoomId(userInfo);
+    console.log('createChatRoom', userInfo);
     // console.log('[SEOYEON] roomid ', roomId);
     let messageInfo = {
       message: 'createChatRoom', //채팅 메세지
@@ -254,7 +255,6 @@ const chatStore = observable({
         const { socketId } = this.userInfo;
         let isMe = false;
         if (socketId === data.socketId) {
-          //isMe
           isMe = true;
         }
 
@@ -308,8 +308,8 @@ const chatStore = observable({
     채팅 메시지 보내기
   */
   sendChatMessage(message, userName) {
-    // console.log('[SEO] !sendChatMessage!', message);
     let { chatMessageMap, userInfo, selectRoomId } = this;
+    console.log('[SEO] !sendChatMessage!', message, userInfo);
     //admin일 경우
     //임시
     if (userName === 'ADMIN') {
@@ -321,7 +321,7 @@ const chatStore = observable({
       message: message, //채팅 메세지
       roomId: selectRoomId,
       socketId: this.chatSocket.id, // 소켓 id 로 구분 함
-      userId: userInfo.userName, // 있으면 id, 없으면 null
+      userId: userInfo.userId, // 있으면 id, 없으면 null
       userName: userInfo.userName, //
       isMe: true, // sendMessage 는 무조건 나
     };

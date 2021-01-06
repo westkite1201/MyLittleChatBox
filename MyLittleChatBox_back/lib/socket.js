@@ -32,21 +32,25 @@ const connection = (io) => {
         let roomList = await userRedis.getChatRoomList(data);
         console.log('roomList ', roomList);
         let messageInfo = data.messageInfo;
+        console.log('messageiNFO ', messageInfo);
         //해당 방에 총 몇개가 쌓여있는지
         //한번메세지가 올떄마다 이루틴을 반복해야한다는게
         //오버헤드가 클꺼같음.;
         let roomsData = await roomList.reduce(async (promise, cur) => {
           let result = await promise.then(); // 누산기 프로미스 풀고 설정
+          let roomIdAnddUserId = cur.split(':');
+
+          let roomId = roomIdAnddUserId[0];
+          let userId = roomIdAnddUserId[1];
           //누산값 재정리
           let value = await userRedis.getChatMessageCount(
             messageInfo.socketId,
-            cur,
+            roomId,
           );
-          let roomIdAnddUserId = cur.split(':');
           let allandReadCountInfo = value.split(':');
           let res = {
-            roomId: roomIdAnddUserId[0],
-            userId: roomIdAnddUserId[1],
+            roomId: roomId,
+            userId: userId,
             allMessageCount: allandReadCountInfo[0],
             readCount: allandReadCountInfo[1],
           };
@@ -61,11 +65,9 @@ const connection = (io) => {
           helpers.returnStatusCode(true, roomsData),
         );
       } catch (e) {
+        console.log('error', e);
         socket.join(roomId); // ADMIN 방에 입장후
-        socket.emit(
-          'getChatRoomList',
-          helpers.returnStatusCode(false, roomsData, e),
-        );
+        socket.emit('getChatRoomList', helpers.returnStatusCode(false, [], e));
       }
     });
     /* message INFO 넣ㄱ ㅣ */
