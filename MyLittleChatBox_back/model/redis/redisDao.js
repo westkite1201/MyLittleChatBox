@@ -66,7 +66,7 @@ const getReadIndex = async (messageInfo) => {
   // let userName = messageInfo.userName;
 
   const key = util.format('%s:%s:%s', KEY_INDEX, socketId, roomId);
-  console.log('getReadIndex => key', key);
+  //console.log('getReadIndex => key', key);
   const readIndex = await redishelpers.redis.get(key);
   return _.isNil(readIndex) ? 0 : readIndex;
 };
@@ -95,7 +95,7 @@ const addMessage = (messageInfo) => {
     userName,
   );
   //const key = util.format("%s:%s", KEY_MESSAGE, messageInfo.roomId);
-  console.log('[SEO][redisDao] key , message', key, value);
+  //console.log('[SEO][redisDao] key , message', key, value);
   return redishelpers.redis.rpush(key, value);
 };
 
@@ -107,17 +107,17 @@ const getChatMessageCount = async (socketId, targetRoomId) => {
   };
   let roomMessageCount = await redishelpers.redis.llen(key); //현재 방의 메세지 카운트
   let messageReadIndex = await getReadIndex(messageInfo); //현재 계정의 읽은 메세지 카운트
-  console.log(
-    'roomMessage messageRedindex ',
-    roomMessageCount,
-    messageReadIndex,
-  );
+  // console.log(
+  //   'roomMessage messageRedindex ',
+  //   roomMessageCount,
+  //   messageReadIndex,
+  // );
   return util.format('%s:%s', roomMessageCount, messageReadIndex);
 };
 //message add 에 소켓 아이디가 필요한가.?
 //그러면 조회도 룸아이디로만
 const getChatMessage = async (messageInfo) => {
-  console.log('[SEO][redisDao]   getChatMessage ', messageInfo);
+  //console.log('[SEO][redisDao]   getChatMessage ', messageInfo);
   const key = util.format('%s:%s', KEY_MESSAGE, messageInfo.roomId);
   /* 현재 읽은 index 저장 */
   setReadIndex(messageInfo);
@@ -127,12 +127,12 @@ const getChatMessage = async (messageInfo) => {
 /* chatRoom 생성  */
 /* set 중복없는 value 값  */
 /* key = roomId + socketId */
-/* value socketId */
+/* value //roomid = 'user.userName' + _'user.socketId'':' + data.messageInfo.userId, */
 const createChatRoom = (data) => {
   /*현재 클라이언트느 어드민이랑만 연결되므로  */
   const key = util.format('%s:%s', KEY_ROOM, 'ADMIN');
   //const key = util.format('%s:%s', KEY_ROOM, data.messageInfo.roomId);
-  console.log('[SEO][createChatRoom] KEY ', key);
+  //console.log('[SEO][createChatRoom] KEY ', key);
   return returnStatusCode(
     redishelpers.redis.sadd(
       key,
@@ -143,7 +143,7 @@ const createChatRoom = (data) => {
 
 const getChatRoomList = async (data) => {
   const key = util.format('%s:%s', KEY_ROOM, 'ADMIN');
-  console.log('[SEO][getChatRoomList] KEY ', key);
+  //console.log('[SEO][getChatRoomList] KEY ', key);
   let resdata = await redishelpers.redis.smembers(key);
   return resdata;
 };
@@ -156,7 +156,7 @@ const joinChatRoom = (messageInfo) => {
 /* 방에서 나가기  */
 /*  socketId에 해당되는 값 제거  */
 const leaveChatRoom = (messageInfo) => {
-  console.log('leaveChatRoom', messageInfo);
+  //console.log('leaveChatRoom', messageInfo);
   const key = util.format('%s:%s', KEY_ROOM, messageInfo.roomId);
   let socketId = messageInfo.socketId;
   redishelpers.redis.srem(key, socketId);

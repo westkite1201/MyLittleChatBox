@@ -30,6 +30,7 @@ const connection = (io) => {
     socket.on('getChatRoomList', async (data) => {
       try {
         let roomList = await userRedis.getChatRoomList(data);
+        console.log('roomList ', roomList);
         let messageInfo = data.messageInfo;
         //해당 방에 총 몇개가 쌓여있는지
         //한번메세지가 올떄마다 이루틴을 반복해야한다는게
@@ -102,7 +103,6 @@ const connection = (io) => {
     //방만들고 방에 들어가기
     socket.on('createChatRoom', function (data) {
       roomId = data.messageInfo.roomId;
-      socketId = data.messageInfo.socketId;
       let response = userRedis.createChatRoom(data);
       socket.join(roomId);
       socket.to(roomId).emit('createChatRoom', { response: response });
