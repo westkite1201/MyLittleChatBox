@@ -141,16 +141,16 @@ const chatStore = observable({
 
   //admin 입장
   joinChatRoom(roomid) {
-    if (this.selectRoomId !== roomid) { 
+    if (this.selectRoomId !== roomid) {
       this.leaveChatRoom(this.selectRoomId);
       this.selectRoomId = roomid;
       this.chatSocket.emit('joinChatRoom', {
         messageInfo: {
           roomId: roomid,
           message: 'admin님이 방에 들어왔습니다', //채팅 메세지
-          socketId: 'system', // 소켓 id 로 구분 함
-          userId: null, // 있으면 id, 없으면 null
-          userName: '', //
+          socketId: this.socketId, // 소켓 id 로 구분 함
+          userId: 'admin', // 있으면 id, 없으면 null
+          userName: 'admin', //
         },
       });
       this.getChatMessage();
