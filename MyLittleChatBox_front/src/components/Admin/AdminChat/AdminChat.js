@@ -62,10 +62,12 @@ const AdminChat = observer(() => {
     },
     chatMessageSendServer(e) {
       e.preventDefault();
-      console.log('chatMessageSendServer!!');
-      chatStore.sendChatMessage(this.chatMsg, 'test');
-      document.getElementById('inputMessage').value = '';
-      this.name = '';
+      if (this.chatMsg !== '') {
+        console.log('chatMessageSendServer!!');
+        chatStore.sendChatMessage(this.chatMsg, 'test');
+        document.getElementById('inputMessage').value = '';
+        this.chatMsg = '';
+      }
     },
     renderChatMessage() {
       const { chatMessageMap, selectRoomId } = chatStore;

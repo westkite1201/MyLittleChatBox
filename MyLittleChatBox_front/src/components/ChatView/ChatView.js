@@ -33,10 +33,11 @@ const ChatView = observer(() => {
     },
     chatMessageSendServer(e) {
       e.preventDefault();
-      chatStore.sendChatMessage(this.chatMsg);
-      document.getElementById('inputMessage').value = '';
-      this.name = '';
-      this.chatMsg = '';
+      if (this.chatMsg !== '') {
+        chatStore.sendChatMessage(this.chatMsg);
+        document.getElementById('inputMessage').value = '';
+        this.chatMsg = '';
+      }
     },
     renderChatMessage() {
       const { chatMessageMap, selectRoomId } = chatStore;
