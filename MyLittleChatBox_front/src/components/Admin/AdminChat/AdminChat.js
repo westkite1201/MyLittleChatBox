@@ -185,6 +185,8 @@ const AdminChat = observer(() => {
   }
   function handleClickLeaveButton() {
     console.log('[masonms] roomMembers: ', chatRoomInfo.roomId + ':' + chatRoomInfo.userId)
+    const chatRoomValue = chatRoomInfo.roomId + ':' + chatRoomInfo.userId;
+    chatStore.deleteChatRoom(chatRoomValue)
   }
   function handleGetChatRoomList() {
     chatStore.getChatRoomList(adminId);

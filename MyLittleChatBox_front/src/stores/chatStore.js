@@ -169,7 +169,9 @@ const chatStore = observable({
     // console.log('[SEO] deleteRedisKey');
     this.chatSocket.emit('deleteRedisKey');
   },
-
+  deleteChatRoom(value) {
+    this.chatSocket.emit('deleteChatRoom', value);
+  },
   //socketConnection
   setSocketConnection(inputUserId, isAdmin) {
     if (isEmpty(this.chatSocket)) {

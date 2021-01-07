@@ -178,6 +178,10 @@ const connection = (io) => {
     });
 
     socket.on("getNowjoinedChatRoom", () => {});
+
+    socket.on("deleteChatRoom", async (value) => {
+      await userRedis.deleteChatRoom(value);
+    });
   });
 };
 module.exports = {
