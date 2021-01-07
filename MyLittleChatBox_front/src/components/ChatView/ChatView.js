@@ -96,6 +96,9 @@ const ChatView = observer(() => {
         <div className="header">
           <span>대화를 시작합시다!</span>
         </div>
+        <button onClick={() => {}}>
+          채팅 그만하기
+        </button>
         <div className="message-wrapper">
           <div className="message-container" ref={messagesRef}>
             {state.messageList}

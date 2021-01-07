@@ -141,8 +141,8 @@ const chatStore = observable({
 
   //admin 입장
   joinChatRoom(roomid) {
-    this.leaveChatRoom(this.selectRoomId);
-    if (this.selectRoomId !== roomid) {
+    if (this.selectRoomId !== roomid) { 
+      this.leaveChatRoom(this.selectRoomId);
       this.selectRoomId = roomid;
       this.chatSocket.emit('joinChatRoom', {
         messageInfo: {

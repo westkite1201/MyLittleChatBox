@@ -46,6 +46,7 @@ const AdminChat = observer(() => {
   console.log('adminChat');
   const [isAdmin, setIsAdmin] = useState(false);
   const [adminId, setAdminId] = useState('admin');
+  const [chatRoomInfo, setChatRoomInfo] = useState()
 
   const { chatStore } = useStore();
   const messagesRef = useRef(null); // 메시지 엘리먼트를 저장
@@ -153,8 +154,10 @@ const AdminChat = observer(() => {
   //     }
   //   };
 
-  function handleJoinChatRoom(roomid) {
-    chatStore.joinChatRoom(roomid);
+  function handleJoinChatRoom(roomInfo) {
+    console.log('[masonms] joinChatRoom roomId: ', roomInfo.roomId, ' / userId: ', roomInfo.userId)
+    setChatRoomInfo(roomInfo)
+    chatStore.joinChatRoom(roomInfo.roomId);
   }
   function createListItem() {
     const { selectRoomId, getRoomNameList } = chatStore;
@@ -164,7 +167,7 @@ const AdminChat = observer(() => {
         <St.RoomItem
           isActive={selectRoomId === item.roomId ? true : false}
           tag="button"
-          onClick={() => handleJoinChatRoom(item.roomId)}
+          onClick={() => handleJoinChatRoom(item)}
           key={i}
           name={item.roomId}
         >
@@ -180,7 +183,9 @@ const AdminChat = observer(() => {
       );
     });
   }
-
+  function handleClickLeaveButton() {
+    console.log('[masonms] roomMembers: ', chatRoomInfo.roomId + ':' + chatRoomInfo.userId)
+  }
   function handleGetChatRoomList() {
     chatStore.getChatRoomList(adminId);
   }
@@ -264,6 +269,16 @@ const AdminChat = observer(() => {
                 >
                   Send
                   <Icon>send</Icon>
+                </Button>
+              </label>
+              <label>
+                <Button
+                  variant="contained"
+                  color="primary"
+                  size={'small'}
+                  onClick={handleClickLeaveButton}
+                >
+                  상담 종료하기
                 </Button>
               </label>
             </form>
