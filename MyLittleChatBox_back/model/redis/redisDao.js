@@ -179,6 +179,10 @@ const getChatRoomMember = (messageInfo) => {
   return redishelpers.redis.smembers(key);
 };
 
+const deleteChatRoom = (value) => {
+  const key = util.format('%s:%s', KEY_ROOM, 'ADMIN')
+  return redishelpers.redis.srem(key, value);
+}
 /////////////////////////////////
 
 //// expire test
@@ -221,6 +225,8 @@ module.exports = {
 
   setReadIndex: setReadIndex,
   getReadIndex: getReadIndex,
+
+  deleteChatRoom: deleteChatRoom,
   // Expire Test
   //expireTest: expireTest,
   setExpireDate: setExpireDate,
