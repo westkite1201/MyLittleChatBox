@@ -50,7 +50,6 @@ const setReadIndex = async (messageInfo) => {
   let socketId = messageInfo.socketId;
   // let userId = messageInfo.userId;
   // let userName = messageInfo.userName;
-
   const lenkey = util.format("%s:%s", KEY_MESSAGE, roomId);
   let indexNum = await redishelpers.redis.llen(lenkey);
   const key = util.format("%s:%s:%s", KEY_INDEX, socketId, roomId);
@@ -151,7 +150,7 @@ const getChatRoomList = async (data) => {
 
 /* 방에 들어가기  */
 const joinChatRoom = (messageInfo) => {
-  console.log(messageInfo);
+  //console.log(messageInfo);
   const key = util.format("%s:%s", KEY_ROOM, messageInfo.roomId);
   console.log("joinChatRoom key", key);
   redishelpers.redis.sadd(key, messageInfo.socketId);
@@ -159,13 +158,12 @@ const joinChatRoom = (messageInfo) => {
 /* 방에서 나가기  */
 /*  socketId에 해당되는 값 제거  */
 const leaveChatRoom = async (messageInfo) => {
-  //console.log('leaveChatRoom', messageInfo);
+  console.log("================leaveChatRoom===================");
   const key = util.format("%s:%s", KEY_ROOM, messageInfo.roomId);
   let socketId = messageInfo.socketId;
+  await redishelpers.redis.smembers(key);
   await redishelpers.redis.srem(key, socketId);
-
   let memberCount = await getChatRoomMember(messageInfo);
-  console.log("memberCount ", memberCount);
   if (memberCount === 0) {
     distroyRoom();
   }
@@ -183,9 +181,9 @@ const getChatRoomMember = (messageInfo) => {
 };
 
 const deleteChatRoom = (value) => {
-  const key = util.format('%s:%s', KEY_ROOM, 'ADMIN')
+  const key = util.format("%s:%s", KEY_ROOM, "ADMIN");
   return redishelpers.redis.srem(key, value);
-}
+};
 /////////////////////////////////
 
 //// expire test

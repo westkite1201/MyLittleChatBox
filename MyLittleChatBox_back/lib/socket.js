@@ -93,7 +93,8 @@ const connection = (io) => {
       });
     });
     //방 나가기
-    socket.on("leaveChatRoom", function (data) {
+    socket.on("leaveChatRoom", async (data) => {
+      console.log("leaveChatRoom ", data);
       let messageInfo = data.messageInfo;
       const { roomId } = messageInfo;
       socket.to(roomId).emit("sendChatMessage", {
@@ -101,10 +102,10 @@ const connection = (io) => {
         roomId: roomId,
         message: ADMIN_LEAVE_ROOM_MSG,
       });
-      socket.leave(roomId); //socketLeave
-      console.log(socket.rooms);
+      socket.leave(roomId); //socketLeav
       //userRedis.addMessage(messageInfo);
-      userRedis.leaveChatRoom(messageInfo);
+      await userRedis.leaveChatRoom(messageInfo);
+      console.log("rooms@@@@@@@@@@@@@@@", socket.rooms);
     });
 
     //방만들고 방에 들어가기
@@ -132,7 +133,12 @@ const connection = (io) => {
 
       //동기로 변경
       await userRedis.addMessage(messageInfo);
-      await userRedis.setReadIndex(messageInfo);
+      //방에 있는 전원 setIndex 진행해야함
+      let members = await userRedis.getChatRoomMember(messageInfo);
+      for (let i = 0; i < members.length; i++) {
+        messageInfo.socketId = members[i];
+        await userRedis.setReadIndex(messageInfo);
+      }
       socket.join(messageInfo.roomId);
       socket.to(messageInfo.roomId).emit("sendChatMessage", messageInfo);
 

@@ -132,9 +132,9 @@ const chatStore = observable({
       messageInfo: {
         roomId: roomId,
         message: 'admin님이 방에서 나갔습니다.',
-        socketId: 'system',
-        userId: null, // 있으면 id, 없으면 null
-        userName: '', //
+        socketId: this.socketId,
+        userId: 'admin', // 있으면 id, 없으면 null
+        userName: 'admin', //
       },
     });
   },
