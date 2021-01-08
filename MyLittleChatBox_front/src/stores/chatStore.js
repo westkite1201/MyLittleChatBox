@@ -107,7 +107,7 @@ const chatStore = observable({
     this.selectRoomId = roomId;
   },
 
-  getChatRoomList(adminId) {
+  getChatRoomList(adminId = 'ADMIN') {
     const { userInfo } = this;
     let roomId = makeRoomId(userInfo);
     this.chatSocket.emit('getChatRoomList', {

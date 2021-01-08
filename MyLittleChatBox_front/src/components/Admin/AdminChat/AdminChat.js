@@ -111,7 +111,8 @@ const AdminChat = observer(() => {
   useEffect(() => {
     if (isAdmin) {
       chatStore.setSocketConnection(adminId, true);
-      chatStore.getChatRoomList(adminId);
+      chatStore.getChatRoomList() // chatRoomList 전체 조회
+      chatStore.getChatRoomList(adminId); // 현재 adminId에 대한 chatRoomList 조회
     }
   }, [isAdmin]);
   const handleSearch = () => {};
