@@ -29,11 +29,12 @@ const St = {
 //   }
 // }
 const ChatItem = ({ item }) => {
-  const { message, userName, isMe } = item;
+  const { message, userName, isMe, sendTime } = item;
   //console.log('ITEM ', item);
   return (
     <St.ChatItemWrapper isMe={isMe}>
       {!isMe && userName}
+      {sendTime}
       <St.ChatItemMessage isMe={isMe}>{message}</St.ChatItemMessage>
     </St.ChatItemWrapper>
   );

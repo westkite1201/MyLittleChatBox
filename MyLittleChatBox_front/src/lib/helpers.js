@@ -13,3 +13,16 @@ export const nicknameMaker = () => {
 export const makeRoomId = (userInfo) => {
   return userInfo.userName + '_' + userInfo.socketId; // 룸_id
 };
+
+export const makeTimeFormat = (sendTime) => {
+  if (sendTime) {
+    let splitTime = sendTime.split('-');
+    let year = splitTime[0];
+    let month = splitTime[1];
+    let day = splitTime[2];
+    let hour = splitTime[3];
+    let minute = splitTime[4];
+    let second = splitTime[5];
+    return hour + '시 ' + minute + '분';
+  }
+};

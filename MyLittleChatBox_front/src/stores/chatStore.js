@@ -3,7 +3,9 @@ import io from 'socket.io-client';
 import { isEmpty, isNil } from 'lodash';
 import { Cookies } from 'react-cookie';
 import { storeContext } from './Context';
-import { nicknameMaker, makeRoomId } from '../lib/helpers';
+import { nicknameMaker, makeRoomId, makeTimeFormat } from '../lib/helpers';
+import moment from 'moment-timezone';
+moment.tz.setDefault('Asia/Seoul');
 configure({
   enforceActions: 'never',
 });
@@ -232,6 +234,7 @@ const chatStore = observable({
             userId: item.userName, // 있으면 id, 없으면 null
             userName: item.userName, //
             isMe: isMe,
+            sendTime: makeTimeFormat(item.sendTime),
           };
           return chatMessage;
         });
@@ -268,6 +271,7 @@ const chatStore = observable({
           userName: data.system ? null : data.userName, //
           isMe: isMe,
           system: data.system ? true : false,
+          sendTime: makeTimeFormat(data.sendTime),
         };
 
         //현재 방에 메세지가 있다면
@@ -326,6 +330,7 @@ const chatStore = observable({
       userId: userInfo.userId, // 있으면 id, 없으면 null
       userName: userInfo.userName, //
       isMe: true, // sendMessage 는 무조건 나
+      sendTime: moment().format('HH시 mm분'),
     };
 
     //현재 방에 메세지가 있다면

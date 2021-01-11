@@ -3,6 +3,8 @@ const userRedis = require('../model/redis/redisDao');
 const helpers = require('../lib/helpers');
 const ADMIN_IN_ROOM_MSG = 'ADMIN님이 방에 입장하였습니다.';
 const ADMIN_LEAVE_ROOM_MSG = 'ADMIN님이 방에서 나갔습니다. ';
+const moment = require('moment-timezone');
+moment.tz.setDefault('Asia/Seoul');
 let roomId = '';
 let socketId = '';
 var admins = [];
@@ -129,6 +131,7 @@ const connection = (io) => {
         socketId: data.socketId, // 소켓 id 로 구분 함
         userId: data.userName, // 있으면 id, 없으면 null
         userName: data.userName, //
+        sendTime: moment().format('YYYY-MM-DD-HH-mm-ss'),
       };
 
       //동기로 변경
@@ -152,25 +155,21 @@ const connection = (io) => {
     //방 메세지 가져오기
     socket.on('getChatMessage', async (data) => {
       let messageInfo = {
-        message: '', //채팅 메세지
         roomId: data.roomId, // 룸_id
-        socketId: data.socketId, // 소켓 id 로 구분 함
-        userId: data.userName, // 있으면 id, 없으면 null
-        userName: data.userName, //
       };
-
       let messageList = await userRedis.getChatMessage(messageInfo);
 
       messageList = messageList.map((item) => {
         messageInfoAssemble = item.split(':');
-        let messageInfo = {
+        let messageInfoTemp = {
           message: messageInfoAssemble[1], //채팅 메세지
           roomId: messageInfoAssemble[2], // 룸_id
           socketId: messageInfoAssemble[3], // 소켓 id 로 구분 함
           userId: messageInfoAssemble[4], // 있으면 id, 없으면 null
           userName: messageInfoAssemble[5], //
+          sendTime: messageInfoAssemble[6],
         };
-        return messageInfo;
+        return messageInfoTemp;
       });
 
       //console.log('[SEO] getChatMessage messageList', messageList);
