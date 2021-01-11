@@ -156,6 +156,7 @@ const connection = (io) => {
     socket.on('getChatMessage', async (data) => {
       let messageInfo = {
         roomId: data.roomId, // 룸_id
+        socketId: data.socketId,
       };
       let messageList = await userRedis.getChatMessage(messageInfo);
 

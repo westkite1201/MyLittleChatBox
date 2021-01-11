@@ -121,7 +121,7 @@ const getChatMessage = async (messageInfo) => {
   //console.log('[SEO][redisDao]   getChatMessage ', messageInfo);
   const key = util.format('%s:%s', KEY_MESSAGE, messageInfo.roomId);
   /* 현재 읽은 index 저장 */
-  setReadIndex(messageInfo);
+  await setReadIndex(messageInfo);
 
   return redishelpers.redis.lrange(key, 0, -1);
 };
